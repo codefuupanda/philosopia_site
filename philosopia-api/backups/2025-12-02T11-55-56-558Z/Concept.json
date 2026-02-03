@@ -1,0 +1,38 @@
+[
+  {
+    "_id": "69283b34fe712127178e4f55",
+    "id": "categorical_imperative",
+    "nameEn": "Categorical Imperative",
+    "nameHe": "הצו הקטגורי",
+    "summaryEn": "Act only according to that maxim whereby you can, at the same time, will that it should become a universal law.",
+    "summaryHe": "פעל רק לפי אותו הכלל המעשי שתוכל לרצות, באותה עת, שיהיה לחוק כללי.",
+    "relatedPhilosophers": [
+      "69247b90207a04492b9b85fb"
+    ],
+    "__v": 0
+  },
+  {
+    "_id": "69283b34fe712127178e4f56",
+    "id": "cogito_ergo_sum",
+    "nameEn": "Cogito, ergo sum",
+    "nameHe": "אני חושב, משמע אני קיים",
+    "summaryEn": "Descartes's first principle of philosophy: the very act of doubting one's existence proves the existence of a mind that doubts.",
+    "summaryHe": "העיקרון הראשון של דקארט: עצם הפעולה של הטלת ספק בקיום מוכיחה את קיומה של תודעה שמטילה ספק.",
+    "relatedPhilosophers": [
+      "69247b8e207a04492b9b85eb"
+    ],
+    "__v": 0
+  },
+  {
+    "_id": "69283b34fe712127178e4f57",
+    "id": "uber_mensch",
+    "nameEn": "Übermensch",
+    "nameHe": "על-אדם",
+    "summaryEn": "Nietzsche's goal for humanity: a being who has overcome traditional morality and created their own values.",
+    "summaryHe": "המטרה של ניטשה לאנושות: אדם שהתגבר על המוסר המסורתי ויצר לעצמו ערכים חדשים.",
+    "relatedPhilosophers": [
+      "69247b91207a04492b9b85ff"
+    ],
+    "__v": 0
+  }
+]

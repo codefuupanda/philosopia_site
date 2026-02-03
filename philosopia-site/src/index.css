@@ -1,0 +1,129 @@
+@import url('https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300;400;500;700&family=Heebo:wght@300;400;500;700&family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .writing-vertical-lr {
+    writing-mode: vertical-lr;
+  }
+  .writing-vertical-rl {
+    writing-mode: vertical-rl;
+  }
+}
+
+@layer base {
+  :root {
+    /* --- LIGHT MODE ("The Library") --- */
+    --background: 60 42% 93%;
+    /* Ivory #F7F6E2 */
+    --foreground: 189 40% 5%;
+    /* Rich Black Text */
+    --card: 45 36% 90%;
+    /* Almond Milk */
+    --card-foreground: 189 40% 5%;
+    --popover: 60 42% 93%;
+    --popover-foreground: 189 40% 5%;
+    --primary: 189 40% 5%;
+    /* Dark Button */
+    --primary-foreground: 60 42% 93%;
+    --secondary: 45 36% 85%;
+    --secondary-foreground: 189 40% 5%;
+    --muted: 45 20% 85%;
+    --muted-foreground: 189 20% 30%;
+    --accent: 45 36% 85%;
+    --accent-foreground: 189 40% 5%;
+    --destructive: 358 60% 36%;
+    /* Crimson Ember #922926 */
+    --destructive-foreground: 60 42% 93%;
+    --border: 30 15% 80%;
+    --input: 30 15% 80%;
+    --ring: 189 40% 5%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* --- DARK MODE ("The Cave" - DEFAULT) --- */
+    --background: 189 40% 5%;
+    /* Rich Black #071011 */
+    --foreground: 60 10% 90%;
+    /* Off-White Text */
+    --card: 40 5% 18%;
+    /* Obsidian #2E2D2B */
+    --card-foreground: 60 10% 90%;
+    --popover: 189 40% 5%;
+    --popover-foreground: 60 10% 90%;
+    --primary: 39 77% 55%;
+    /* Hunyadi Yellow (Gold) */
+    --primary-foreground: 189 40% 5%;
+    --secondary: 40 5% 25%;
+    --secondary-foreground: 60 10% 90%;
+    --muted: 189 20% 15%;
+    --muted-foreground: 60 5% 60%;
+    --accent: 40 5% 25%;
+    --accent-foreground: 60 10% 90%;
+    --destructive: 358 60% 45%;
+    --destructive-foreground: 60 10% 90%;
+    --border: 189 20% 15%;
+    --input: 189 20% 15%;
+    --ring: 39 77% 55%;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* GLOBAL BASE STYLES */
+/* -------------------------------------------------------------------------- */
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: var(--font-family-base);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Wiki Content overrides for Dark Mode */
+.wiki-content {
+  line-height: 1.8;
+  font-size: 1.05rem;
+}
+
+.wiki-content p {
+  margin-bottom: 1.5rem;
+  color: hsl(var(--foreground));
+}
+
+.wiki-content h2,
+.wiki-content h3 {
+  color: hsl(var(--foreground));
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  font-family: var(--font-family-serif);
+}
+
+.wiki-content b,
+.wiki-content strong {
+  font-weight: 700;
+  color: hsl(var(--primary));
+}
+
+/* Hide unwanted wiki elements */
+.wiki-content .mw-empty-elt,
+.wiki-content .reference,
+.wiki-content .hatnote,
+.wiki-content .infobox,
+.wiki-content table,
+.wiki-content img {
+  display: none;
+}

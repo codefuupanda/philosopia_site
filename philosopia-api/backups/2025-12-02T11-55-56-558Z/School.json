@@ -1,0 +1,242 @@
+[
+  {
+    "_id": "69283cfe8e57ade85f4bb7a0",
+    "id": "milesian_school",
+    "nameEn": "Milesian School",
+    "nameHe": "האסכולה המילזית",
+    "descriptionEn": "The first school of Greek philosophy, focused on discovering the fundamental substance (Archê) of the universe.",
+    "descriptionHe": "האסכולה הראשונה של הפילוסופיה היוונית. התמקדה בחיפוש אחר ה'ארכה' - החומר הראשוני שממנו עשוי היקום.",
+    "periodId": "pre_socratic",
+    "__v": 0
+  },
+  {
+    "_id": "69283cfe8e57ade85f4bb7a1",
+    "id": "pythagoreanism",
+    "nameEn": "Pythagoreanism",
+    "nameHe": "האסכולה הפיתגוראית",
+    "descriptionEn": "A mystical and mathematical school believing that 'all is number' and in the transmigration of souls.",
+    "descriptionHe": "אסכולה מיסטית ומתמטית שהאמינה כי 'הכל מספר' ודגלה בגלגול נשמות ואורח חיים סגפני.",
+    "periodId": "pre_socratic",
+    "__v": 0
+  },
+  {
+    "_id": "69283cfe8e57ade85f4bb7a2",
+    "id": "ionian_school",
+    "nameEn": "Ionian School",
+    "nameHe": "האסכולה היונית",
+    "descriptionEn": "A group of thinkers from Ionia who sought natural explanations for the world, rejecting mythological ones.",
+    "descriptionHe": "קבוצת הוגים מאיוניה שחיפשו הסברים טבעיים לעולם ודחו הסברים מיתולוגיים.",
+    "periodId": "pre_socratic",
+    "__v": 0
+  },
+  {
+    "_id": "69283cfe8e57ade85f4bb7a3",
+    "id": "eleatic_school",
+    "nameEn": "Eleatic School",
+    "nameHe": "האסכולה האלאטית",
+    "descriptionEn": "Argued that reality is one, changeless, and indivisible, challenging the reliance on sensory experience.",
+    "descriptionHe": "טענה שהמציאות היא אחת, בלתי משתנה ובלתי ניתנת לחלוקה, ותקפה את ההסתמכות על החושים.",
+    "periodId": "pre_socratic",
+    "__v": 0
+  },
+  {
+    "_id": "69283cfe8e57ade85f4bb7a4",
+    "id": "pluralist_school",
+    "nameEn": "Pluralist School",
+    "nameHe": "האסכולה הפלורליסטית",
+    "descriptionEn": "Attempted to reconcile Parmenides' logic with sensory change by proposing multiple fundamental elements.",
+    "descriptionHe": "ניסתה ליישב בין הלוגיקה של פרמנידס לבין השינוי הנקלט בחושים על ידי הצגת יסודות מרובים.",
+    "periodId": "pre_socratic",
+    "__v": 0
+  },
+  {
+    "_id": "69283cfe8e57ade85f4bb7a5",
+    "id": "atomist_school",
+    "nameEn": "Atomist School",
+    "nameHe": "האסכולה האטומית",
+    "descriptionEn": "Proposed that the universe is composed of small, indivisible particles (atoms) moving in a void.",
+    "descriptionHe": "הציעה שהיקום מורכב מחלקיקים קטנים ובלתי ניתנים לחלוקה (אטומים) הנעים בריק.",
+    "periodId": "pre_socratic",
+    "__v": 0
+  },
+  {
+    "_id": "69283cfe8e57ade85f4bb7a6",
+    "id": "sophist_movement",
+    "nameEn": "Sophist Movement",
+    "nameHe": "התנועה הסופיסטית",
+    "descriptionEn": "Traveling teachers who taught rhetoric and argued that truth is relative to the individual.",
+    "descriptionHe": "מורים נודדים שלימדו רטוריקה וטענו שהאמת היא יחסית לאדם (רלטיביזם).",
+    "periodId": "classical_period",
+    "__v": 0
+  },
+  {
+    "_id": "69283cfe8e57ade85f4bb7a7",
+    "id": "classical_greek",
+    "nameEn": "Classical Greek",
+    "nameHe": "פילוסופיה קלאסית",
+    "descriptionEn": "The golden age of philosophy centered in Athens, focusing on ethics, politics, and metaphysics.",
+    "descriptionHe": "תור הזהב של הפילוסופיה באתונה, שהתמקד באתיקה, פוליטיקה ומטאפיזיקה.",
+    "periodId": "classical_period",
+    "__v": 0
+  },
+  {
+    "_id": "69283cfe8e57ade85f4bb7a8",
+    "id": "platonism",
+    "nameEn": "Platonism",
+    "nameHe": "אפלטוניזם",
+    "descriptionEn": "Based on the philosophy of Plato, emphasizing the existence of abstract objects (Forms) distinct from the sensible world.",
+    "descriptionHe": "מבוססת על הגותו של אפלטון, מדגישה את קיומן של אידיאות מופשטות הנפרדות מהעולם המוחשי.",
+    "periodId": "classical_period",
+    "__v": 0
+  },
+  {
+    "_id": "69283cfe8e57ade85f4bb7a9",
+    "id": "peripatetic_school",
+    "nameEn": "Peripatetic School",
+    "nameHe": "האסכולה הפריפטטית",
+    "descriptionEn": "The school of Aristotle, known for its focus on logic, biology, and empirical observation.",
+    "descriptionHe": "האסכולה של אריסטו, ידועה בהתמקדותה בלוגיקה, ביולוגיה ותצפית אמפירית.",
+    "periodId": "classical_period",
+    "__v": 0
+  },
+  {
+    "_id": "69283cfe8e57ade85f4bb7aa",
+    "id": "cynicism",
+    "nameEn": "Cynicism",
+    "nameHe": "ציניקנים",
+    "descriptionEn": "Advocated for a life lived in accordance with nature, rejecting wealth, power, and fame.",
+    "descriptionHe": "דגלה בחיים על פי הטבע, תוך דחייה של עושר, כוח ותהילה.",
+    "periodId": "hellenistic_period",
+    "__v": 0
+  },
+  {
+    "_id": "69283cfe8e57ade85f4bb7ab",
+    "id": "stoicism",
+    "nameEn": "Stoicism",
+    "nameHe": "האסכולה הסטואית",
+    "descriptionEn": "Teaches that virtue is the only good and that we should accept what we cannot control while mastering our own minds.",
+    "descriptionHe": "מלמדת שהמידה הטובה היא הטוב היחיד, ושיש לקבל את מה שאינו בשליטתנו תוך שליטה מוחלטת בתודעתנו.",
+    "periodId": "hellenistic_period",
+    "__v": 0
+  },
+  {
+    "_id": "69283cfe8e57ade85f4bb7ac",
+    "id": "epicureanism",
+    "nameEn": "Epicureanism",
+    "nameHe": "האסכולה האפיקוראית",
+    "descriptionEn": "Philosophy seeking happiness through the pursuit of pleasure (absence of pain) and friendship.",
+    "descriptionHe": "פילוסופיה המבקשת אושר באמצעות רדיפת הנאה (היעדר כאב) וחברות.",
+    "periodId": "hellenistic_period",
+    "__v": 0
+  },
+  {
+    "_id": "69283cfe8e57ade85f4bb7ad",
+    "id": "skepticism",
+    "nameEn": "Skepticism",
+    "nameHe": "ספקנות",
+    "descriptionEn": "The practice of suspending judgment and questioning the possibility of certain knowledge.",
+    "descriptionHe": "הפרקטיקה של השהיית שיפוט והטלת ספק באפשרות של ידע ודאי.",
+    "periodId": "hellenistic_period",
+    "__v": 0
+  },
+  {
+    "_id": "69283cfe8e57ade85f4bb7ae",
+    "id": "scholasticism",
+    "nameEn": "Scholasticism",
+    "nameHe": "סכולסטיקה",
+    "descriptionEn": "Medieval school of thought that attempted to reconcile Christian theology with classical philosophy (Aristotle).",
+    "descriptionHe": "אסכולה מימי הביניים שניסתה ליישב בין התיאולוגיה הנוצרית לבין הפילוסופיה הקלאסית (אריסטו).",
+    "periodId": "medieval_period",
+    "__v": 0
+  },
+  {
+    "_id": "69283cfe8e57ade85f4bb7af",
+    "id": "rationalism",
+    "nameEn": "Rationalism",
+    "nameHe": "רציונליזם",
+    "descriptionEn": "The view that reason is the chief source and test of knowledge.",
+    "descriptionHe": "ההשקפה שהתבונה היא המקור העיקרי והמבחן לידע.",
+    "periodId": "early_modern_period",
+    "__v": 0
+  },
+  {
+    "_id": "69283cfe8e57ade85f4bb7b0",
+    "id": "empiricism",
+    "nameEn": "Empiricism",
+    "nameHe": "אמפיריציזם",
+    "descriptionEn": "The theory that all knowledge is derived from sense-experience.",
+    "descriptionHe": "התיאוריה שכל הידע נגזר מניסיון חושי.",
+    "periodId": "early_modern_period",
+    "__v": 0
+  },
+  {
+    "_id": "69283cfe8e57ade85f4bb7b1",
+    "id": "social_contract",
+    "nameEn": "Social Contract",
+    "nameHe": "האמנה החברתית",
+    "descriptionEn": "Theories addressing the origin of society and the legitimacy of the authority of the state over the individual.",
+    "descriptionHe": "תיאוריות העוסקות במקור החברה ובלגיטימיות של סמכות המדינה על הפרט.",
+    "periodId": "early_modern_period",
+    "__v": 0
+  },
+  {
+    "_id": "69283cfe8e57ade85f4bb7b2",
+    "id": "german_idealism",
+    "nameEn": "German Idealism",
+    "nameHe": "אידיאליזם גרמני",
+    "descriptionEn": "A movement that emphasized the mental or spiritual character of reality.",
+    "descriptionHe": "תנועה שהדגישה את האופי המנטלי או הרוחני של המציאות.",
+    "periodId": "modern_period",
+    "__v": 0
+  },
+  {
+    "_id": "69283cfe8e57ade85f4bb7b3",
+    "id": "marxism",
+    "nameEn": "Marxism",
+    "nameHe": "מרקסיזם",
+    "descriptionEn": "A method of socioeconomic analysis that uses a materialist interpretation of historical development.",
+    "descriptionHe": "שיטה לניתוח סוציו-אקונומי המשתמשת בפרשנות מטריאליסטית להתפתחות היסטורית.",
+    "periodId": "modern_period",
+    "__v": 0
+  },
+  {
+    "_id": "69283cfe8e57ade85f4bb7b4",
+    "id": "utilitarianism",
+    "nameEn": "Utilitarianism",
+    "nameHe": "תועלתנות",
+    "descriptionEn": "The doctrine that actions are right if they are useful or for the benefit of a majority.",
+    "descriptionHe": "הדוקטרינה שפעולות הן נכונות אם הן מועילות או לטובת הרוב.",
+    "periodId": "modern_period",
+    "__v": 0
+  },
+  {
+    "_id": "69283cfe8e57ade85f4bb7b5",
+    "id": "existentialism",
+    "nameEn": "Existentialism",
+    "nameHe": "אקזיסטנציאליזם",
+    "descriptionEn": "Emphasizes individual existence, freedom and choice.",
+    "descriptionHe": "מדגישה את הקיום האינדיבידואלי, החופש והבחירה.",
+    "periodId": "modern_period",
+    "__v": 0
+  },
+  {
+    "_id": "69283cfe8e57ade85f4bb7b6",
+    "id": "continental_philosophy",
+    "nameEn": "Continental Philosophy",
+    "nameHe": "פילוסופיה קונטיננטלית",
+    "descriptionEn": "A set of 19th and 20th-century philosophical traditions from mainland Europe.",
+    "descriptionHe": "קבוצה של מסורות פילוסופיות מהמאה ה-19 וה-20 מאירופה היבשתית.",
+    "periodId": "modern_period",
+    "__v": 0
+  },
+  {
+    "_id": "69283cfe8e57ade85f4bb7b7",
+    "id": "analytic_philosophy",
+    "nameEn": "Analytic Philosophy",
+    "nameHe": "פילוסופיה אנליטית",
+    "descriptionEn": "A style of philosophy emphasizing clarity and argument, often using formal logic.",
+    "descriptionHe": "סגנון פילוסופי המדגיש בהירות וטיעון, לעתים קרובות תוך שימוש בלוגיקה פורמלית.",
+    "periodId": "modern_period",
+    "__v": 0
+  }
+]
