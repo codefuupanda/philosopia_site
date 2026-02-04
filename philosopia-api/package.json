@@ -21,7 +21,8 @@
     "express": "^5.1.0",
     "html-to-text": "^9.0.5",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^9.0.0",
+    "mongodb": "^7.1.0",
+    "mongoose": "^9.1.5",
     "wikijs": "^6.4.1"
   },
   "devDependencies": {

@@ -12,10 +12,14 @@ const artworkRoutes = require("./routes/artworkRoutes");
 const authRoutes = require("./routes/authRoutes");
 const quotesRoutes = require("./routes/quotes");
 const worksRoutes = require("./routes/works");
+const requestLogger = require("./middleware/requestLogger");
+const { cacheMiddleware } = require("./middleware/cache");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(requestLogger);
+app.use(cacheMiddleware(5 * 60 * 1000)); // 5 minute TTL
 
 // Database Connection
 mongoose.connect(process.env.MONGO_URI)

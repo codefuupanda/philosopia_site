@@ -1,0 +1,16 @@
+{
+  "name": "philosopia",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n api,site -c blue,green \"npm run dev --prefix philosopia-api\" \"npm start --prefix philosopia-site\"",
+    "start:api": "npm start --prefix philosopia-api",
+    "start:site": "npm start --prefix philosopia-site",
+    "build": "npm run build --prefix philosopia-site",
+    "seed": "npm run seed:all --prefix philosopia-api",
+    "install:all": "npm install && npm install --prefix philosopia-api && npm install --prefix philosopia-site"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
