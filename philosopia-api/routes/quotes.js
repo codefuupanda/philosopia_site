@@ -1,6 +1,7 @@
-const express = require('express');
+import express from 'express';
+import Quote from '../models/Quote.js';
+
 const router = express.Router();
-const Quote = require('../models/Quote');
 
 // GET /api/quotes
 router.get('/', async (req, res) => {
@@ -23,4 +24,4 @@ router.get('/', async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

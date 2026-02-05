@@ -1,4 +1,4 @@
-module.exports = [
+export default [
     {
         id: "pre_socratic",
         nameEn: "Pre-Socratic",

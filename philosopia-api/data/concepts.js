@@ -1,4 +1,4 @@
-module.exports = [
+export default [
     {
         id: "categorical_imperative",
         nameEn: "Categorical Imperative",

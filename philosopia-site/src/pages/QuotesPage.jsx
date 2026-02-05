@@ -4,6 +4,7 @@ import { api } from '../lib/api';
 import { texts } from '../i18n/texts';
 import { cn } from '../lib/utils';
 import { Copy } from 'lucide-react';
+import { Loader } from '../components/ui/Loader';
 
 export default function QuotesPage() {
     const location = useLocation();
@@ -103,7 +104,7 @@ export default function QuotesPage() {
             </div>
 
             {loading ? (
-                <div className="text-center py-20 animate-pulse">{t.loading}</div>
+                <div className="py-20 flex justify-center"><Loader /></div>
             ) : (
                 /* Masonry-ish Layout using Columns */
                 <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">

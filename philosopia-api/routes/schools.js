@@ -1,7 +1,8 @@
-const express = require('express');
+import express from 'express';
+import School from '../models/School.js';
+import Philosopher from '../models/Philosopher.js';
+
 const router = express.Router();
-const School = require('../models/School');
-const Philosopher = require('../models/Philosopher');
 
 // GET /api/schools - Get all schools
 router.get('/', async (req, res) => {
@@ -45,9 +46,7 @@ router.get('/:id', async (req, res) => {
     const schoolId = req.params.id;
 
     const result = await School.aggregate([
-      {
-        $match: { id: schoolId }
-      },
+      { $match: { id: schoolId } },
       {
         $lookup: {
           from: 'philosophers',
@@ -86,4 +85,4 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

@@ -1,11 +1,11 @@
-module.exports = [
+export default [
     {
-        id: "school_of_athens", // Added ID
+        id: "school_of_athens",
         title: "The School of Athens",
         artist: "Raphael",
         year: "1509–1511",
         location: "Apostolic Palace, Vatican City",
-        description: "Raphael’s fresco is the visual embodiment of the High Renaissance synthesis of classical thought and Christian theology. Located in the Stanza della Segnatura, the Pope’s library, it depicts the greatest minds of antiquity.",
+        description: "Raphael's fresco is the visual embodiment of the High Renaissance synthesis of classical thought and Christian theology. Located in the Stanza della Segnatura, the Pope's library, it depicts the greatest minds of antiquity.",
         filename: "Scuola_di_atene_02.jpg",
         philosopher: "Plato & Aristotle",
         status: "pd"
@@ -16,7 +16,7 @@ module.exports = [
         artist: "Sandro Botticelli",
         year: "c. 1484–1486",
         location: "Uffizi Gallery, Florence",
-        description: "Botticelli’s work marks a pivotal moment in Western art: the first large-scale painting of a nude female figure since antiquity that was not Eve. It depicts the goddess Venus arriving at the shore after her birth.",
+        description: "Botticelli's work marks a pivotal moment in Western art: the first large-scale painting of a nude female figure since antiquity that was not Eve. It depicts the goddess Venus arriving at the shore after her birth.",
         filename: "Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg",
         status: "pd"
     },
@@ -56,7 +56,7 @@ module.exports = [
         artist: "Caspar David Friedrich",
         year: "1808–1810",
         location: "Alte Nationalgalerie, Berlin",
-        description: "Friedrich’s masterpiece is a radical departure from traditional landscape painting. He eliminates the 'repoussoir' and lowers the horizon line, filling 80% of the canvas with a dark, oppressive sky.",
+        description: "Friedrich's masterpiece is a radical departure from traditional landscape painting. He eliminates the 'repoussoir' and lowers the horizon line, filling 80% of the canvas with a dark, oppressive sky.",
         filename: "Caspar_David_Friedrich_-_Der_Mönch_am_Meer_-_Google_Art_Project.jpg",
         status: "pd"
     },
@@ -76,7 +76,7 @@ module.exports = [
         artist: "Francisco Goya",
         year: "c. 1819–1823",
         location: "Museo del Prado, Madrid",
-        description: "This is one of the 'Black Paintings,' originally painted directly onto the plaster walls of Goya’s home. It depicts the titan Cronus (Saturn) ripping apart the body of one of his children.",
+        description: "This is one of the 'Black Paintings,' originally painted directly onto the plaster walls of Goya's home. It depicts the titan Cronus (Saturn) ripping apart the body of one of his children.",
         filename: "Francisco_de_Goya,_Saturno_devorando_a_su_hijo_(1819-1823).jpg",
         status: "pd"
     },

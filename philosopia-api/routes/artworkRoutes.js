@@ -1,6 +1,7 @@
-const express = require('express');
+import express from 'express';
+import Artwork from '../models/Artwork.js';
+
 const router = express.Router();
-const Artwork = require('../models/Artwork');
 
 // @desc    Get all artworks
 // @route   GET /api/artworks
@@ -15,4 +16,4 @@ router.get('/', async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

@@ -1,25 +1,24 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const PeriodSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true },
-  wikidataId: { type: String, unique: true, sparse: true }, // For syncing with Wikidata
-  nameEn: { type: String, required: true }, // Deprecated
-  nameHe: { type: String, required: true }, // Deprecated
+  wikidataId: { type: String, unique: true, sparse: true },
+  nameEn: { type: String, required: true },
+  nameHe: { type: String, required: true },
   name: {
     en: String,
     he: String
   },
 
-  descriptionHe: String, // Deprecated
-  descriptionEn: String, // Deprecated
+  descriptionHe: String,
+  descriptionEn: String,
   description: {
     en: String,
     he: String
   },
 
-  // These are required for the Timeline to work:
   startYear: { type: Number, required: true },
   endYear: { type: Number, required: true }
 });
 
-module.exports = mongoose.model('Period', PeriodSchema);
+export default mongoose.model('Period', PeriodSchema);

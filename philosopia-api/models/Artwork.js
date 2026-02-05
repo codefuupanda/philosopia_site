@@ -1,9 +1,9 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const artworkSchema = new mongoose.Schema({
     id: {
         type: String,
-        required: false, // Optional for now, will be populated
+        required: false,
         unique: true,
         sparse: true
     },
@@ -29,13 +29,11 @@ const artworkSchema = new mongoose.Schema({
     },
     filename: {
         type: String,
-        required: true,
-        help: "The exact filename on Wikimedia Commons"
+        required: true
     },
-    philosopher: { // Deprecated string field
+    philosopher: {
         type: String,
-        required: false,
-        help: "Name of the philosopher this artwork is related to"
+        required: false
     },
     relatedPhilosopherIds: [String],
     relatedPhilosophers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Philosopher' }],
@@ -47,16 +45,14 @@ const artworkSchema = new mongoose.Schema({
     },
     externalLink: {
         type: String,
-        required: false,
-        help: "Link to museum page for copyrighted works"
+        required: false
     },
     warning: {
         type: String,
-        required: false,
-        help: "Warning message for restricted content"
+        required: false
     }
 }, {
     timestamps: true
 });
 
-module.exports = mongoose.model('Artwork', artworkSchema);
+export default mongoose.model('Artwork', artworkSchema);

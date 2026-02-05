@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { Trash2, Plus, LogOut } from 'lucide-react';
+import { Loader } from '../components/ui/Loader';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
 
@@ -172,7 +173,7 @@ function AdminDashboard() {
                     {/* Beef List */}
                     <div className="lg:col-span-2 space-y-4">
                         <h2 className="text-xl font-bold mb-4">Existing Beefs</h2>
-                        {loading ? <p>Loading...</p> : beefs.map(beef => (
+                        {loading ? <div className="py-10 flex justify-center"><Loader /></div> : beefs.map(beef => (
                             <div key={beef.id} className="bg-card p-4 rounded-xl border border-amber-500 flex justify-between items-center">
                                 <div>
                                     <h3 className="font-bold text-lg">{beef.titleEn}</h3>

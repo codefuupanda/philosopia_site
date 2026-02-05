@@ -1,4 +1,4 @@
-const axios = require('axios');
+import axios from 'axios';
 
 const WIKIDATA_ENDPOINT = 'https://query.wikidata.org/sparql';
 
@@ -16,10 +16,10 @@ async function getWikipediaData(title) {
         });
 
         const data = response.data;
-        
+
         return {
             // The full intro paragraph
-            bioHtml: data.extract_html || data.extract, 
+            bioHtml: data.extract_html || data.extract,
             // The main page image
             imageUrl: data.thumbnail ? data.thumbnail.source : (data.originalimage ? data.originalimage.source : null)
         };
@@ -68,7 +68,7 @@ async function getWikidataRelationships(qid, wikiTitle) {
         });
 
         const results = response.data.results.bindings;
-        
+
         const propertyMap = {
             'http://www.wikidata.org/entity/P737': 'influencedBy',
             'http://www.wikidata.org/entity/P802': 'students',
@@ -81,7 +81,7 @@ async function getWikidataRelationships(qid, wikiTitle) {
             if (binding.prop) {
                 const propUri = binding.prop.value;
                 const fieldName = propertyMap[propUri];
-                
+
                 if (fieldName && binding.item) {
                     const itemQid = binding.item.value.split('/').pop();
                     const itemData = {
@@ -89,7 +89,7 @@ async function getWikidataRelationships(qid, wikiTitle) {
                         labelEn: binding.itemLabelEn?.value,
                         labelHe: binding.itemLabelHe?.value || binding.itemLabelEn?.value,
                     };
-                    
+
                     const exists = structuredRelations[fieldName].some(i => i.qid === itemQid);
                     if (!exists) {
                         structuredRelations[fieldName].push(itemData);
@@ -110,4 +110,4 @@ async function getWikidataRelationships(qid, wikiTitle) {
     };
 }
 
-module.exports = { getWikidataRelationships };
+export { getWikidataRelationships };

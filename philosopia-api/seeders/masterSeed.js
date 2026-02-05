@@ -1,5 +1,5 @@
-const { execSync } = require('child_process');
-const colors = require('colors');
+import { execSync } from 'child_process';
+import colors from 'colors';
 
 // List of scripts in the exact execution order
 const scripts = [

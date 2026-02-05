@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import { useLanguage } from "../i18n/LanguageContext";
+import { Loader } from '../components/ui/Loader';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
 
@@ -27,7 +28,7 @@ export default function BeefDetailPage() {
     fetchBeef();
   }, [id]);
 
-  if (loading) return <div className="p-20 text-center">Loading Fight...</div>;
+  if (loading) return <div className="p-20 flex justify-center"><Loader /></div>;
   if (!beef) return <div className="p-20 text-center">Beef Not Found</div>;
 
   const title = isHebrew ? beef.titleHe : beef.titleEn;

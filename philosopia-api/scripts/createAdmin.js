@@ -1,7 +1,7 @@
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-const colors = require('colors');
-const User = require('../models/User');
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import colors from 'colors';
+import User from '../models/User.js';
 
 dotenv.config();
 

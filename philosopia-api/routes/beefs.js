@@ -1,8 +1,9 @@
-const express = require("express");
+import express from "express";
+import Beef from "../models/beef.js";
+import Philosopher from "../models/Philosopher.js";
+import { protect } from "../middleware/authMiddleware.js";
+
 const router = express.Router();
-const Beef = require("../models/beef");
-const Philosopher = require("../models/Philosopher");
-const { protect } = require("../middleware/authMiddleware");
 
 // GET /api/beefs (Get all beefs with philosopher data)
 router.get("/", async (req, res) => {
@@ -65,4 +66,4 @@ router.delete("/:id", protect, async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

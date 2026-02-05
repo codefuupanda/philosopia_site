@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useLanguage } from "../i18n/LanguageContext";
 import { Swords } from "lucide-react";
+import { Loader } from '../components/ui/Loader';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
 
@@ -39,7 +40,7 @@ export default function BeefsPage() {
     // Navigation happens via the Link component automatically
   };
 
-  if (loading) return <div className="p-20 text-center text-muted-foreground animate-pulse">Loading Beefs...</div>;
+  if (loading) return <div className="p-20 flex justify-center"><Loader /></div>;
 
   return (
     <div dir={isHebrew ? 'rtl' : 'ltr'} className="container max-w-4xl mx-auto py-12 px-4">

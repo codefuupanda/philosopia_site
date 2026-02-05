@@ -1,21 +1,29 @@
-const mongoose = require("mongoose");
-const dotenv = require("dotenv");
-const colors = require("colors");
-const Philosopher = require("../models/Philosopher");
-const School = require("../models/School");
-const Period = require("../models/Period");
-const Concept = require("../models/Concept");
-const Beef = require("../models/beef");
-const Work = require("../models/Work");
-const Quote = require("../models/Quote");
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import colors from "colors";
+import path from "path";
+import { fileURLToPath } from "url";
+import Philosopher from "../models/Philosopher.js";
+import School from "../models/School.js";
+import Period from "../models/Period.js";
+import Concept from "../models/Concept.js";
+import Beef from "../models/beef.js";
+import Work from "../models/Work.js";
+import Quote from "../models/Quote.js";
 
-const periodsData = require("../data/periods");
-const schoolsData = require("../data/schools");
-const beefsData = require("../data/beefs");
-const conceptsData = require("../data/concepts");
+import periodsData from "../data/periods.js";
+import schoolsData from "../data/schools.js";
+import beefsData from "../data/beefs.js";
+import conceptsData from "../data/concepts.js";
+
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
 const philosophersData = require("../data/philosophers.json");
 
-dotenv.config({ path: require("path").join(__dirname, "../.env") });
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.join(__dirname, "../.env") });
 
 const seed = async () => {
   try {

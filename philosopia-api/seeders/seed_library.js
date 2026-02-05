@@ -1,9 +1,9 @@
-const mongoose = require("mongoose");
-const dotenv = require("dotenv");
-const colors = require("colors");
-const Philosopher = require("../models/Philosopher");
-const Work = require("../models/Work");
-const Quote = require("../models/Quote");
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import colors from "colors";
+import Philosopher from "../models/Philosopher.js";
+import Work from "../models/Work.js";
+import Quote from "../models/Quote.js";
 
 dotenv.config();
 

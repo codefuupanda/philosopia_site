@@ -1,4 +1,4 @@
-module.exports = [
+export default [
     {
         id: 'plato_vs_aristotle',
         titleEn: 'The Battle for the Locus of Reality',

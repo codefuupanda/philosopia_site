@@ -1,6 +1,7 @@
-const express = require('express');
+import express from 'express';
+import Work from '../models/Work.js';
+
 const router = express.Router();
-const Work = require('../models/Work');
 
 // GET /api/works
 router.get('/', async (req, res) => {
@@ -12,4 +13,4 @@ router.get('/', async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

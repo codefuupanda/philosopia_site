@@ -19,21 +19,18 @@ function requestLogger(req, res, next) {
   const start = Date.now();
   const timestamp = new Date().toISOString();
 
-  // Capture the original end function
   const originalEnd = res.end;
 
   res.end = function(...args) {
     const duration = Date.now() - start;
     const status = res.statusCode;
 
-    // Color code based on status
     let statusColor;
     if (status >= 500) statusColor = colors.red;
     else if (status >= 400) statusColor = colors.yellow;
     else if (status >= 300) statusColor = colors.cyan;
     else statusColor = colors.green;
 
-    // Format: [timestamp] METHOD /path STATUS duration
     console.log(
       `${colors.gray}[${timestamp}]${colors.reset}`,
       `${colors.bold}${req.method.padEnd(6)}${colors.reset}`,
@@ -48,4 +45,4 @@ function requestLogger(req, res, next) {
   next();
 }
 
-module.exports = requestLogger;
+export default requestLogger;

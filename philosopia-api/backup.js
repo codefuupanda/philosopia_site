@@ -1,16 +1,30 @@
-const mongoose = require('mongoose');
-const fs = require('fs');
-const path = require('path');
-require('dotenv').config();
+import mongoose from 'mongoose';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+
+import Philosopher from './models/Philosopher.js';
+import School from './models/School.js';
+import Period from './models/Period.js';
+import Concept from './models/Concept.js';
+import Beef from './models/beef.js';
+import Artwork from './models/Artwork.js';
+import User from './models/User.js';
+
+dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const models = {
-    Philosopher: require('./models/Philosopher'),
-    School: require('./models/School'),
-    Period: require('./models/Period'),
-    Concept: require('./models/Concept'),
-    Beef: require('./models/beef'),
-    Artwork: require('./models/Artwork'),
-    User: require('./models/User')
+    Philosopher,
+    School,
+    Period,
+    Concept,
+    Beef,
+    Artwork,
+    User
 };
 
 const backupDir = path.join(__dirname, 'backups', new Date().toISOString().replace(/[:.]/g, '-'));

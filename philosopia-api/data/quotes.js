@@ -1,4 +1,4 @@
-module.exports = [
+export default [
     {
         philosopherId: "thales",
         quotesEn: ["Water is the principle of all things.", "Know thyself."],

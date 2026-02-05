@@ -1,19 +1,32 @@
-const express = require("express");
-const cors = require("cors");
-const mongoose = require("mongoose");
-require("dotenv").config();
+import path from "path";
+import { fileURLToPath } from "url";
+import dns from "dns";
+import express from "express";
+import cors from "cors";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
 
-const philosophersRoutes = require("./routes/philosophers");
-const periodsRoutes = require("./routes/periods");
-const conceptsRouter = require("./routes/concepts");
-const schoolsRoutes = require("./routes/schools");
-const beefsRoutes = require("./routes/beefs");
-const artworkRoutes = require("./routes/artworkRoutes");
-const authRoutes = require("./routes/authRoutes");
-const quotesRoutes = require("./routes/quotes");
-const worksRoutes = require("./routes/works");
-const requestLogger = require("./middleware/requestLogger");
-const { cacheMiddleware } = require("./middleware/cache");
+import philosophersRoutes from "./routes/philosophers.js";
+import periodsRoutes from "./routes/periods.js";
+import conceptsRouter from "./routes/concepts.js";
+import schoolsRoutes from "./routes/schools.js";
+import beefsRoutes from "./routes/beefs.js";
+import artworkRoutes from "./routes/artworkRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
+import quotesRoutes from "./routes/quotes.js";
+import worksRoutes from "./routes/works.js";
+import requestLogger from "./middleware/requestLogger.js";
+import { cacheMiddleware } from "./middleware/cache.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.join(__dirname, ".env") });
+
+if (process.env.USE_CUSTOM_DNS === "true") {
+  dns.setServers(["8.8.8.8", "8.8.4.4"]);
+  console.log("Using custom DNS servers (Google DNS)");
+}
 
 const app = express();
 app.use(cors());

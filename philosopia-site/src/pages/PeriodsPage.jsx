@@ -12,7 +12,8 @@ import { Separator } from "../components/ui/separator";
 import { ScrollArea } from "../components/ui/scroll-area";
 
 // Icons
-import { Scroll, Quote, BookOpen, ArrowRight, Loader2, Menu, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Scroll, Quote, BookOpen, ArrowRight, Menu, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Loader } from '../components/ui/Loader';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
 
@@ -135,8 +136,8 @@ export default function PeriodsPage() {
   // Loading State
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center text-primary">
-        <Loader2 className="w-10 h-10 animate-spin" />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader />
       </div>
     );
   }
@@ -200,7 +201,7 @@ export default function PeriodsPage() {
         </div>
 
         {/* B. ACTIVE ERA PANEL (Tree Structure) */}
-        <div className="w-64 flex flex-col h-full bg-card/50">
+        <div className="w-42 flex flex-col h-full bg-card/50">
           <div className="p-6 border-b border-amber-500/20">
             <h2 className="text-xl font-serif font-bold text-foreground">
               {activeEra ? (isHebrew ? activeEra.nameHe : activeEra.nameEn) : "Philosopia"}
@@ -210,7 +211,7 @@ export default function PeriodsPage() {
             </p>
           </div>
 
-          <ScrollArea className="flex-1 py-6 px-4" dir={isHebrew ? 'rtl' : 'ltr'}>
+          <ScrollArea className="flex-1 py-6 ps-4 pe-2" dir={isHebrew ? 'rtl' : 'ltr'}>
             {activeEra && (
               <div className="relative">
                 {/* Tree Trunk */}
@@ -242,7 +243,7 @@ export default function PeriodsPage() {
                            group relative w-full flex items-center gap-3 py-2 px-2 rounded-md transition-all duration-200
                            ltr:ml-3 rtl:mr-3
                            ${isSelected
-                            ? 'bg-amber-500 text-white shadow-md'
+                            ? 'bg-amber-500 text-black shadow-md'
                             : 'hover:bg-amber-500/10 text-muted-foreground hover:text-foreground'}
                          `}
                       >

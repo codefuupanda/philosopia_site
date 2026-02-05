@@ -1,18 +1,17 @@
-// F:\philosopia_site\philosopia-api\models\School.js
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const SchoolSchema = new mongoose.Schema({
-  id: { type: String, required: true, unique: true }, // e.g. "stoicism"
-  nameEn: { type: String, required: true }, // Deprecated
-  nameHe: { type: String, required: true }, // Deprecated
+  id: { type: String, required: true, unique: true },
+  nameEn: { type: String, required: true },
+  nameHe: { type: String, required: true },
 
   name: {
     en: String,
     he: String
   },
 
-  descriptionEn: String, // Deprecated
-  descriptionHe: String, // Deprecated
+  descriptionEn: String,
+  descriptionHe: String,
 
   description: {
     en: String,
@@ -24,7 +23,6 @@ const SchoolSchema = new mongoose.Schema({
 
   wikidataId: String,
 
-  // Enhanced Data
   yearsEn: String,
   yearsHe: String,
   locationEn: String,
@@ -33,4 +31,4 @@ const SchoolSchema = new mongoose.Schema({
   famousQuoteHe: String
 });
 
-module.exports = mongoose.model('School', SchoolSchema);
+export default mongoose.model('School', SchoolSchema);

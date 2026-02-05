@@ -9,11 +9,10 @@
  */
 
 class MemoryCache {
-  constructor(defaultTTL = 300000) { // Default: 5 minutes
+  constructor(defaultTTL = 300000) {
     this.cache = new Map();
     this.defaultTTL = defaultTTL;
 
-    // Cleanup expired entries every minute
     setInterval(() => this.cleanup(), 60000);
   }
 
@@ -39,7 +38,6 @@ class MemoryCache {
     this.cache.delete(key);
   }
 
-  // Clear keys matching prefix (e.g., invalidate all /philosophers routes)
   invalidatePrefix(prefix) {
     for (const key of this.cache.keys()) {
       if (key.startsWith(prefix)) {
@@ -62,13 +60,9 @@ class MemoryCache {
   }
 }
 
-// Singleton instance
-const cache = new MemoryCache();
+export const cache = new MemoryCache();
 
-/**
- * Express middleware for caching GET responses
- */
-function cacheMiddleware(ttl = 300000) {
+export function cacheMiddleware(ttl = 300000) {
   return (req, res, next) => {
     if (req.method !== 'GET') return next();
 
@@ -92,5 +86,3 @@ function cacheMiddleware(ttl = 300000) {
     next();
   };
 }
-
-module.exports = { cache, cacheMiddleware };

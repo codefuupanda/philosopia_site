@@ -1,9 +1,9 @@
-const mongoose = require('mongoose');
-const axios = require('axios');
-const dotenv = require('dotenv');
-const colors = require('colors');
-const Philosopher = require('../models/Philosopher');
-const { getWikidataRelationships } = require('./universalEnricher');
+import mongoose from 'mongoose';
+import axios from 'axios';
+import dotenv from 'dotenv';
+import colors from 'colors';
+import Philosopher from '../models/Philosopher.js';
+import { getWikidataRelationships } from './universalEnricher.js';
 
 dotenv.config();
 

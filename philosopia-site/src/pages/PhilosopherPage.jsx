@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { useLanguage } from '../i18n/LanguageContext';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
+import { Loader } from '../components/ui/Loader';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
 
@@ -56,7 +57,7 @@ export default function PhilosopherPage() {
     fetchData();
   }, [id]);
 
-  if (loading) return <div className="p-20 text-center animate-pulse text-xl text-muted-foreground">Loading...</div>;
+  if (loading) return <div className="p-20 flex justify-center"><Loader /></div>;
   if (!philosopher) return <div className="p-20 text-center text-destructive text-xl">Philosopher Not Found</div>;
 
   const name = isHebrew ? philosopher.nameHe : philosopher.nameEn;

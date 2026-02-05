@@ -1,14 +1,14 @@
-const express = require("express");
+import express from "express";
+import Concept from "../models/Concept.js";
+
 const router = express.Router();
-const Concept = require("../models/Concept");
 
 // GET /api/concepts (All concepts)
 router.get("/", async (req, res) => {
   try {
-    // ✅ FIX: Added .populate() to get the philosopher details inside the list
     const concepts = await Concept.find()
-      .populate('relatedPhilosophers', 'id nameEn nameHe imageUrl'); 
-    
+      .populate('relatedPhilosophers', 'id nameEn nameHe imageUrl');
+
     res.json({ concepts });
   } catch (error) {
     res.status(500).json({ error: "Server Error" });
@@ -28,4 +28,4 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

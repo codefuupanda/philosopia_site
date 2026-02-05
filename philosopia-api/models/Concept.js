@@ -1,37 +1,35 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const ConceptSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true },
-  nameEn: { type: String, required: true }, // Deprecated
-  nameHe: { type: String, required: true }, // Deprecated
+  nameEn: { type: String, required: true },
+  nameHe: { type: String, required: true },
   name: {
     en: String,
     he: String
   },
 
-  summaryEn: String, // Short definition // Deprecated
-  summaryHe: String, // Deprecated
+  summaryEn: String,
+  summaryHe: String,
   summary: {
     en: String,
     he: String
   },
 
-  descriptionEn: String, // Long explanation (optional) // Deprecated
-  descriptionHe: String, // Deprecated
+  descriptionEn: String,
+  descriptionHe: String,
   description: {
     en: String,
     he: String
   },
 
-  // Enhanced Data
   originDateEn: String,
   originDateHe: String,
-  domainEn: String, // e.g. "Metaphysics", "Ethics"
+  domainEn: String,
   domainHe: String,
 
-  // The Link: Which philosophers are famous for this?
-  relatedPhilosopherIds: [String], // Stable String IDs
+  relatedPhilosopherIds: [String],
   relatedPhilosophers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Philosopher' }]
 });
 
-module.exports = mongoose.model('Concept', ConceptSchema);
+export default mongoose.model('Concept', ConceptSchema);

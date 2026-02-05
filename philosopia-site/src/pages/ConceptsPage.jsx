@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useLanguage } from '../i18n/LanguageContext';
 import { Lightbulb } from 'lucide-react';
+import { Loader } from '../components/ui/Loader';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
 
@@ -27,7 +28,7 @@ export default function ConceptsPage() {
     fetchConcepts();
   }, []);
 
-  if (loading) return <div className="p-20 text-center text-muted-foreground animate-pulse">Loading Dictionary...</div>;
+  if (loading) return <div className="p-20 flex justify-center"><Loader /></div>;
 
   return (
     <div dir={isHebrew ? 'rtl' : 'ltr'} className="container max-w-6xl mx-auto py-12 px-4">

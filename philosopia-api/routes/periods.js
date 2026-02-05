@@ -1,31 +1,24 @@
-const express = require('express');
+import express from 'express';
+import Period from '../models/Period.js';
+import Philosopher from '../models/Philosopher.js';
+import hiddenPeriods from '../config/hiddenPeriods.js';
+
 const router = express.Router();
-const Period = require('../models/Period');
-const Philosopher = require('../models/Philosopher');
-const hiddenPeriods = require('../config/hiddenPeriods');
 
 // GET /api/periods
-// Returns periods with their associated philosophers nested inside
 router.get('/', async (req, res) => {
   try {
     const periods = await Period.aggregate([
-      // 0. Filter out hidden periods
       { $match: { nameEn: { $nin: hiddenPeriods } } },
-
-      // 1. Sort by chronological order
       { $sort: { order: 1 } },
-
-      // 2. Join with Philosophers
       {
         $lookup: {
-          from: 'philosophers',       // Collection name in MongoDB
-          localField: 'id',           // Field in Period (e.g., "ancient")
-          foreignField: 'periodId',   // Field in Philosopher linking to period
-          as: 'philosophers'          // Result array name
+          from: 'philosophers',
+          localField: 'id',
+          foreignField: 'periodId',
+          as: 'philosophers'
         }
       },
-
-      // 3. Project and Transform
       {
         $project: {
           id: 1,
@@ -44,19 +37,14 @@ router.get('/', async (req, res) => {
                 id: "$$phil.id",
                 nameEn: "$$phil.nameEn",
                 nameHe: "$$phil.nameHe",
-                // Map years to 'dates' for frontend compatibility
                 dates: "$$phil.yearsEn",
                 yearsEn: "$$phil.yearsEn",
                 yearsHe: "$$phil.yearsHe",
                 imageUrl: "$$phil.imageUrl",
-                // Map first key idea to bigIdea
                 bigIdeaEn: { $arrayElemAt: ["$$phil.keyIdeasEn", 0] },
                 bigIdeaHe: { $arrayElemAt: ["$$phil.keyIdeasHe", 0] },
-                // Map first quote to quote
                 quote: { $arrayElemAt: ["$$phil.quotesEn", 0] },
-                // Map keyIdeas to tags
                 tags: "$$phil.keyIdeasEn",
-                // Include summaries for fallback display
                 summaryEn: "$$phil.summaryEn",
                 summaryHe: "$$phil.summaryHe",
                 schoolId: "$$phil.schoolId"
@@ -88,4 +76,4 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

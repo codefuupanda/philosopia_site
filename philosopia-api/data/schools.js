@@ -1,4 +1,4 @@
-module.exports = [
+export default [
     {
         id: "milesian_school", nameEn: "Milesian School", nameHe: "האסכולה המילזית", periodId: "pre_socratic",
         descriptionEn: "The first school of Greek philosophy, focused on discovering the fundamental substance (Archê) of the universe.",

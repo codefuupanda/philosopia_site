@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { api } from '../lib/api';
 import { texts } from '../i18n/texts';
 import { WorkCard } from '../components/WorkCard';
+import { Loader } from '../components/ui/Loader';
 import { cn } from '../lib/utils';
 
 export default function WorksPage() {
@@ -41,8 +42,8 @@ export default function WorksPage() {
             </header>
 
             {loading ? (
-                <div className="flex items-center justify-center h-64 text-muted-foreground animate-pulse">
-                    {t.loading}
+                <div className="flex items-center justify-center h-64">
+                    <Loader />
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

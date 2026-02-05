@@ -1,9 +1,9 @@
-const mongoose = require("mongoose");
-const dotenv = require("dotenv");
-const colors = require("colors");
-const Artwork = require("../models/Artwork");
-const Philosopher = require("../models/Philosopher");
-const artworksData = require("../data/artworks");
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import colors from "colors";
+import Artwork from "../models/Artwork.js";
+import Philosopher from "../models/Philosopher.js";
+import artworksData from "../data/artworks.js";
 
 dotenv.config();
 

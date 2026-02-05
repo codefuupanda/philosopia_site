@@ -137,7 +137,7 @@ function AppShell() {
 
       {/* MAIN */}
       <main className="flex-1 flex justify-center py-8 px-4">
-        <div className="w-full max-w-[1200px]">
+        <div className="w-full max-w-[1600px]">
           <Routes>
             {/* Hebrew Routes */}
             <Route path="/he" element={<HomePage />} />

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { useLanguage } from "../i18n/LanguageContext";
 import { Brain } from 'lucide-react';
+import { Loader } from '../components/ui/Loader';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
 
@@ -33,8 +34,8 @@ export default function PhilosophersPage() {
 
   if (loading) {
     return (
-      <div className="p-20 text-center text-muted-foreground animate-pulse">
-        {isHebrew ? "טוען פילוסופים..." : "Loading philosophers..."}
+      <div className="p-20 flex justify-center">
+        <Loader />
       </div>
     );
   }

@@ -1,13 +1,12 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const WorkSchema = new mongoose.Schema({
-    id: { type: String, required: true, unique: true }, // Slug
+    id: { type: String, required: true, unique: true },
     title: {
         en: { type: String, required: true },
         he: { type: String, required: true }
     },
 
-    // Relationship to Author
     philosopherId: { type: String, required: true },
     philosopher: { type: mongoose.Schema.Types.ObjectId, ref: 'Philosopher' },
 
@@ -15,4 +14,4 @@ const WorkSchema = new mongoose.Schema({
     wikiLink: String
 });
 
-module.exports = mongoose.model('Work', WorkSchema);
+export default mongoose.model('Work', WorkSchema);

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../i18n/LanguageContext';
+import { Loader } from '../components/ui/Loader';
 
 const ArtAndPhiloPage = () => {
     const [artworks, setArtworks] = useState([]);
@@ -66,7 +67,7 @@ const ArtAndPhiloPage = () => {
         };
     };
 
-    if (loading) return <div className="p-10 text-center text-muted-foreground">Loading gallery...</div>;
+    if (loading) return <div className="p-20 flex justify-center"><Loader /></div>;
 
     return (
         <div className="container mx-auto px-4 py-8">

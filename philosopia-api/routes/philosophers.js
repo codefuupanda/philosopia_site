@@ -1,7 +1,8 @@
-const express = require("express");
+import express from "express";
+import Philosopher from "../models/Philosopher.js";
+import Concept from "../models/Concept.js";
+
 const router = express.Router();
-const Philosopher = require("../models/Philosopher");
-const Concept = require("../models/Concept"); // ✅ Import Concept Model
 
 // GET /api/philosophers (List)
 router.get("/", async (req, res) => {
@@ -30,22 +31,18 @@ router.get("/", async (req, res) => {
 // GET /api/philosophers/:id (Detail + Linked Concepts)
 router.get("/:id", async (req, res) => {
   try {
-    // 1. Find the Philosopher
     const philosopher = await Philosopher.findOne({ id: req.params.id });
 
     if (!philosopher) {
       return res.status(404).json({ error: "Philosopher not found" });
     }
 
-    // 2. ✅ REVERSE LOOKUP: Find concepts that link TO this philosopher
-    // We look for concepts where the 'relatedPhilosophers' array contains this philosopher's DB _id
     const linkedConcepts = await Concept.find({ relatedPhilosophers: philosopher._id })
-      .select('id nameEn nameHe summaryEn summaryHe'); // Only get needed fields
+      .select('id nameEn nameHe summaryEn summaryHe');
 
-    // 3. Return both
-    res.json({ 
+    res.json({
         philosopher,
-        linkedConcepts // Send this new data to the frontend
+        linkedConcepts
     });
 
   } catch (error) {
@@ -54,4 +51,4 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

@@ -1,6 +1,5 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
-// Define a schema for relational data fetched from Wikidata
 const WikidataRelationSchema = new mongoose.Schema({
     qid: { type: String, required: true },
     labelEn: { type: String, required: true },
@@ -8,12 +7,10 @@ const WikidataRelationSchema = new mongoose.Schema({
 }, { _id: false });
 
 const PhilosopherSchema = new mongoose.Schema({
-    // --- Core Identifiers ---
     id: { type: String, required: true, unique: true },
-    nameEn: { type: String, required: true }, // Deprecated
-    nameHe: { type: String, required: true }, // Deprecated
+    nameEn: { type: String, required: true },
+    nameHe: { type: String, required: true },
 
-    // New Multilingual Name
     name: {
         en: String,
         he: String
@@ -25,16 +22,15 @@ const PhilosopherSchema = new mongoose.Schema({
     periodId: { type: String, required: true },
     period: { type: mongoose.Schema.Types.ObjectId, ref: 'Period' },
 
-    // --- Content Fields ---
-    yearsEn: String, // Deprecated
-    yearsHe: String, // Deprecated
+    yearsEn: String,
+    yearsHe: String,
     years: {
         en: String,
         he: String
     },
 
-    summaryEn: String, // Deprecated
-    summaryHe: String, // Deprecated
+    summaryEn: String,
+    summaryHe: String,
     summary: {
         en: String,
         he: String
@@ -44,33 +40,29 @@ const PhilosopherSchema = new mongoose.Schema({
         he: String
     },
 
-    keyIdeasEn: [String], // Deprecated
-    keyIdeasHe: [String], // Deprecated
+    keyIdeasEn: [String],
+    keyIdeasHe: [String],
     keyIdeas: {
         en: [String],
         he: [String]
     },
 
-    // ✅ NEW: Quotes Arrays
-    quotesEn: [String], // Deprecated
-    quotesHe: [String], // Deprecated
+    quotesEn: [String],
+    quotesHe: [String],
     quotes: {
         en: [String],
         he: [String]
     },
 
-    // --- Wikidata Integration ---
     wikiTitle: { type: String, required: true },
     wikiQid: { type: String, index: true },
     bioHtml: String,
     bioText: String,
 
-    // Images
     manualImageUrl: String,
     enrichedImageUrl: String,
-    imageUrl: String, // Legacy/Fallback
+    imageUrl: String,
 
-    // Extended Wiki Data
     wikiData: {
         bioEn: String,
         bioHe: String,
@@ -87,18 +79,15 @@ const PhilosopherSchema = new mongoose.Schema({
         }
     },
 
-    // --- Relations (Strategy 2) ---
     countryOfCitizenship: [WikidataRelationSchema],
     influencedBy: [WikidataRelationSchema],
     students: [WikidataRelationSchema],
     foundationalTexts: [WikidataRelationSchema],
     religion: [WikidataRelationSchema],
 
-    // --- Metadata ---
     lastEnriched: { type: Date, default: Date.now },
 });
 
-// Add text index for search
 PhilosopherSchema.index({ "name.en": "text", "name.he": "text", bioText: "text" });
 
-module.exports = mongoose.model('Philosopher', PhilosopherSchema);
+export default mongoose.model('Philosopher', PhilosopherSchema);

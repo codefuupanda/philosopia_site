@@ -1,4 +1,4 @@
-module.exports = [
+export default [
     "all-time",
     "Boring Billion",
     "Variscan orogeny",

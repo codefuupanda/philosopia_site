@@ -13,6 +13,7 @@ import {
 import { useLanguage } from "../i18n/LanguageContext";
 import { texts } from "../i18n/texts";
 import { Logo } from "../components/ui/Logo";
+import { Loader } from '../components/ui/Loader';
 import { cn } from "../lib/utils";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
@@ -121,8 +122,8 @@ function HomePage() {
         {/* SLOT 1: Philosopher Spotlight (2x2) */}
         <div className="md:col-span-2 md:row-span-2 relative group overflow-hidden rounded-3xl bg-card border border-border shadow-sm hover:shadow-xl transition-all duration-500">
           {isLoading ? (
-            <div className="w-full h-full flex items-center justify-center bg-muted/20 animate-pulse">
-              <Sparkles className="w-10 h-10 text-muted-foreground opacity-20" />
+            <div className="w-full h-full flex items-center justify-center bg-muted/20">
+              <Loader />
             </div>
           ) : (
             <Link to={`${basePath}/philosophers/${randomPhilosopher?.id}`} className="block w-full h-full relative">
