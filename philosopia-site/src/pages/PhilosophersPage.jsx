@@ -1,36 +1,65 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import axios from "axios";
+import React, { useEffect, useState, useCallback } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { useLanguage } from "../i18n/LanguageContext";
-import { Brain } from 'lucide-react';
+import { api } from "../lib/api";
+import { texts } from "../i18n/texts";
+import { Brain, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Loader } from '../components/ui/Loader';
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
+const PAGE_SIZE = 12;
 
 export default function PhilosophersPage() {
   const { language: lang } = useLanguage();
   const isHebrew = lang === "he";
+  const t = texts[lang];
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [philosophers, setPhilosophers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const page = Math.max(1, parseInt(searchParams.get("page")) || 1);
 
   useEffect(() => {
-    async function loadPhilosophers() {
+    const loadPhilosophers = async () => {
       try {
         setLoading(true);
         setError(null);
-        const res = await axios.get(`${API_BASE_URL}/philosophers`);
-        setPhilosophers(res.data.philosophers || []);
+        const data = await api.getPhilosophers({ page, limit: PAGE_SIZE });
+        setPhilosophers(data.philosophers || []);
+        setTotalPages(data.totalPages || 1);
       } catch (err) {
         console.error("Error loading philosophers:", err);
         setError(isHebrew ? "שגיאה בטעינת רשימת הפילוסופים." : "Error loading philosophers list.");
       } finally {
         setLoading(false);
       }
-    }
+    };
     loadPhilosophers();
-  }, [isHebrew]);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [page, isHebrew]);
+
+  const goToPage = useCallback((p) => {
+    setSearchParams({ page: p });
+  }, [setSearchParams]);
+
+  // Build page numbers with ellipsis
+  const getPageNumbers = () => {
+    const pages = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (page > 3) pages.push("...");
+      for (let i = Math.max(2, page - 1); i <= Math.min(totalPages - 1, page + 1); i++) {
+        pages.push(i);
+      }
+      if (page < totalPages - 2) pages.push("...");
+      pages.push(totalPages);
+    }
+    return pages;
+  };
 
   if (loading) {
     return (
@@ -122,6 +151,47 @@ export default function PhilosophersPage() {
           </div>
         ))}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <nav className="flex items-center justify-center gap-2 mt-12">
+          <button
+            onClick={() => goToPage(page - 1)}
+            disabled={page <= 1}
+            className="flex items-center gap-1 px-4 py-2 text-sm font-medium rounded-lg border border-border bg-card hover:bg-primary/10 hover:border-primary/30 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            {isHebrew ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+            {t.prev_page}
+          </button>
+
+          {getPageNumbers().map((p, i) =>
+            p === "..." ? (
+              <span key={`ellipsis-${i}`} className="px-2 text-muted-foreground">...</span>
+            ) : (
+              <button
+                key={p}
+                onClick={() => goToPage(p)}
+                className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
+                  p === page
+                    ? "bg-amber-500 text-black border border-amber-500"
+                    : "border border-border bg-card hover:bg-primary/10 hover:border-primary/30"
+                }`}
+              >
+                {p}
+              </button>
+            )
+          )}
+
+          <button
+            onClick={() => goToPage(page + 1)}
+            disabled={page >= totalPages}
+            className="flex items-center gap-1 px-4 py-2 text-sm font-medium rounded-lg border border-border bg-card hover:bg-primary/10 hover:border-primary/30 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            {t.next_page}
+            {isHebrew ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+          </button>
+        </nav>
+      )}
     </div>
   );
 }

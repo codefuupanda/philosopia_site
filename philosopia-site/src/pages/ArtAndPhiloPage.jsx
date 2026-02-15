@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../i18n/LanguageContext';
+import { api } from '../lib/api';
+import { getCache, setCache } from '../lib/cache';
 import { Loader } from '../components/ui/Loader';
+
+const ARTWORKS_CACHE_KEY = 'artworks:enhanced';
 
 const ArtAndPhiloPage = () => {
     const [artworks, setArtworks] = useState([]);
@@ -11,8 +15,15 @@ const ArtAndPhiloPage = () => {
     useEffect(() => {
         const fetchArtworks = async () => {
             try {
-                const response = await fetch('http://localhost:5000/api/artworks');
-                const data = await response.json();
+                // Check for cached enhanced data first
+                const cached = getCache(ARTWORKS_CACHE_KEY);
+                if (cached) {
+                    setArtworks(cached);
+                    setLoading(false);
+                    return;
+                }
+
+                const data = await api.getArtworks();
 
                 // Enhance data with MediaWiki images
                 const enhancedData = await Promise.all(data.map(async (work) => {
@@ -27,6 +38,7 @@ const ArtAndPhiloPage = () => {
                     }
                 }));
 
+                setCache(ARTWORKS_CACHE_KEY, enhancedData, 10 * 60 * 1000);
                 setArtworks(enhancedData);
             } catch (error) {
                 console.error('Error fetching artworks:', error);

@@ -58,6 +58,8 @@ export const texts = {
     quote_copy: "העתק",
     quote_copied: "הועתק!",
     read_more: "קרא עוד",
+    prev_page: "הקודם",
+    next_page: "הבא",
   },
   en: {
     // מפתחות קיימים
@@ -118,5 +120,7 @@ export const texts = {
     quote_copy: "Copy",
     quote_copied: "Copied!",
     read_more: "Read More",
+    prev_page: "Previous",
+    next_page: "Next",
   },
 };
