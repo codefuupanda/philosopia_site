@@ -60,6 +60,8 @@ export const texts = {
     read_more: "קרא עוד",
     prev_page: "הקודם",
     next_page: "הבא",
+    view_grid: "הצג פילוסופים",
+    view_timeline: "הצג ציר זמן",
   },
   en: {
     // מפתחות קיימים
@@ -122,5 +124,7 @@ export const texts = {
     read_more: "Read More",
     prev_page: "Previous",
     next_page: "Next",
+    view_grid: "Show Philosophers",
+    view_timeline: "Show Timeline",
   },
 };

@@ -11,7 +11,6 @@ import { useEffect } from "react";
 
 // --- Pages ---
 import HomePage from "./pages/HomePage";
-import PeriodsPage from "./pages/PeriodsPage";
 import PeriodDetailPage from "./pages/PeriodDetailPage";
 import PhilosopherPage from "./pages/PhilosopherPage";
 import PhilosophersPage from "./pages/PhilosophersPage";
@@ -68,7 +67,6 @@ function AppShell() {
   };
 
   const navLinks = [
-    { to: `${basePath}/periods`, label: t.navPeriods },
     { to: `${basePath}/philosophers`, label: t.navPhilosophers },
     { to: `${basePath}/schools`, label: t.navSchools },
     { to: `${basePath}/concepts`, label: t.navConcepts },
@@ -141,7 +139,7 @@ function AppShell() {
           <Routes>
             {/* Hebrew Routes */}
             <Route path="/he" element={<HomePage />} />
-            <Route path="/he/periods" element={<PeriodsPage />} />
+            <Route path="/he/periods" element={<Navigate to="/he/philosophers?view=timeline" replace />} />
             <Route path="/he/periods/:periodId" element={<PeriodDetailPage />} />
             <Route path="/he/philosophers" element={<PhilosophersPage />} />
             <Route path="/he/philosophers/:id" element={<PhilosopherPage />} />
@@ -158,7 +156,7 @@ function AppShell() {
 
             {/* English Routes */}
             <Route path="/en" element={<HomePage />} />
-            <Route path="/en/periods" element={<PeriodsPage />} />
+            <Route path="/en/periods" element={<Navigate to="/en/philosophers?view=timeline" replace />} />
             <Route path="/en/periods/:periodId" element={<PeriodDetailPage />} />
             <Route path="/en/philosophers" element={<PhilosophersPage />} />
             <Route path="/en/philosophers/:id" element={<PhilosopherPage />} />
