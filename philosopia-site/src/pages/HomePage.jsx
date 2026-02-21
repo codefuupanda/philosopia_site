@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from "react-router-dom";
-import axios from "axios";
 import {
   Quote,
   ArrowRight,
@@ -12,11 +11,10 @@ import {
 } from 'lucide-react';
 import { useLanguage } from "../i18n/LanguageContext";
 import { texts } from "../i18n/texts";
+import { api } from "../lib/api";
 import { Logo } from "../components/ui/Logo";
 import { Loader } from '../components/ui/Loader';
 import { cn } from "../lib/utils";
-
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
 
 function HomePage() {
   const { language } = useLanguage();
@@ -26,47 +24,22 @@ function HomePage() {
 
   const [randomPhilosopher, setRandomPhilosopher] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const hasFetched = useRef(false);
 
-  // Fetch a random philosopher for the Spotlight
+  // Fetch once via cached API layer. Store raw data (both languages)
+  // so language toggles don't trigger a re-fetch.
   useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+
     const fetchRandomPhilosopher = async () => {
       try {
-        let allPhilosophers = [];
-        try {
-          const res = await axios.get(`${API_BASE_URL}/philosophers`);
-          allPhilosophers = res.data.philosophers || [];
-        } catch (e) {
-          console.warn("Backend not reachable, using mock data.");
-          // Fallback mock data if backend fails
-          allPhilosophers = [
-            {
-              id: "nietzsche",
-              nameEn: "Friedrich Nietzsche",
-              nameHe: "פרידריך ניטשה",
-              imageUrl: "https://upload.wikimedia.org/wikipedia/commons/1/1b/Nietzsche187a.jpg",
-            },
-            {
-              id: "plato",
-              nameEn: "Plato",
-              nameHe: "אפלטון",
-              imageUrl: "https://upload.wikimedia.org/wikipedia/commons/8/88/Plato_Silanion_Musei_Capitolini_MC1377.jpg"
-            },
-            {
-              id: "aristotle",
-              nameEn: "Aristotle",
-              nameHe: "אריסטו",
-              imageUrl: "https://upload.wikimedia.org/wikipedia/commons/a/ae/Aristotle_Altemps_Inv8575.jpg"
-            }
-          ];
-        }
+        const data = await api.getPhilosophers({ page: 1, limit: 50 });
+        const allPhilosophers = data.philosophers || [];
 
         if (allPhilosophers.length > 0) {
           const random = allPhilosophers[Math.floor(Math.random() * allPhilosophers.length)];
-          setRandomPhilosopher({
-            id: random.id,
-            name: isHebrew ? random.nameHe : random.nameEn,
-            image: random.imageUrl,
-          });
+          setRandomPhilosopher(random);
         }
       } catch (err) {
         console.error("Error fetching philosopher:", err);
@@ -76,7 +49,7 @@ function HomePage() {
     };
 
     fetchRandomPhilosopher();
-  }, [isHebrew]);
+  }, []);
 
   return (
     <div className="space-y-16 pb-20">
@@ -128,8 +101,8 @@ function HomePage() {
           ) : (
             <Link to={`${basePath}/philosophers/${randomPhilosopher?.id}`} className="block w-full h-full relative">
               <img
-                src={randomPhilosopher?.image}
-                alt={randomPhilosopher?.name}
+                src={randomPhilosopher?.imageUrl}
+                alt={isHebrew ? randomPhilosopher?.nameHe : randomPhilosopher?.nameEn}
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
@@ -138,7 +111,9 @@ function HomePage() {
                   <Sparkles className="w-4 h-4" />
                   <span>{isHebrew ? "פילוסוף נבחר" : "Philosopher Spotlight"}</span>
                 </div>
-                <h2 className="text-4xl font-serif font-bold mb-2">{randomPhilosopher?.name}</h2>
+                <h2 className="text-4xl font-serif font-bold mb-2">
+                  {isHebrew ? randomPhilosopher?.nameHe : randomPhilosopher?.nameEn}
+                </h2>
                 <p className="text-white/80 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-2 group-hover:translate-y-0">
                   {isHebrew ? "לחץ כדי לגלות עוד" : "Click to discover more"}
                 </p>

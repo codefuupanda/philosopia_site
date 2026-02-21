@@ -17,10 +17,10 @@ const ArtAndPhiloPage = () => {
             try {
                 // Check for cached enhanced data first
                 const cached = getCache(ARTWORKS_CACHE_KEY);
-                if (cached) {
-                    setArtworks(cached);
+                if (cached && cached.data) {
+                    setArtworks(cached.data);
                     setLoading(false);
-                    return;
+                    if (!cached.isStale) return;
                 }
 
                 const data = await api.getArtworks();

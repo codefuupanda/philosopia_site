@@ -434,7 +434,7 @@ export default function PeriodsPage() {
 
       {/* DETAILS MODAL */}
       <Dialog open={!!selectedPhilosopher} onOpenChange={() => setSelectedPhilosopher(null)}>
-        <DialogContent className="bg-background dark:bg-card border border-amber-500 text-foreground max-w-3xl overflow-y-auto max-h-[90vh]">
+        <DialogContent className="border-amber-500 max-w-3xl overflow-y-auto max-h-[90vh]">
           {selectedPhilosopher && (
             <>
               <DialogHeader>

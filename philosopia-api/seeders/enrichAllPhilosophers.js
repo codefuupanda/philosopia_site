@@ -68,6 +68,10 @@ const enrichAll = async () => {
                 }
 
                 if (enrichedData.bioHtml) p.bioHtml = enrichedData.bioHtml;
+                if (enrichedData.bioHtmlHe) {
+                    if (!p.wikiData) p.wikiData = {};
+                    p.wikiData.bioHe = enrichedData.bioHtmlHe;
+                }
 
                 if (enrichedData.influencedBy && enrichedData.influencedBy.length > 0) p.influencedBy = enrichedData.influencedBy;
                 if (enrichedData.students && enrichedData.students.length > 0) p.students = enrichedData.students;

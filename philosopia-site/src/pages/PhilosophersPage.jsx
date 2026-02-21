@@ -597,11 +597,11 @@ function TimelineView({ lang, isHebrew }) {
 
       {/* DETAILS MODAL */}
       <Dialog open={!!selectedPhilosopher} onOpenChange={() => setSelectedPhilosopher(null)}>
-        <DialogContent className="bg-background dark:bg-card border border-amber-500 text-foreground max-w-3xl overflow-y-auto max-h-[90vh]">
+        <DialogContent dir={isHebrew ? "rtl" : "ltr"} className="border-amber-500 max-w-3xl overflow-y-auto max-h-[90vh]">
           {selectedPhilosopher && (
             <>
               <DialogHeader>
-                <DialogTitle className="text-3xl font-serif text-primary flex items-center gap-3">
+                <DialogTitle className="text-3xl font-serif text-primary flex items-center justify-center gap-3">
                   {isHebrew ? selectedPhilosopher.nameHe : selectedPhilosopher.nameEn}
                 </DialogTitle>
                 <DialogDescription className="text-primary/80 font-mono">

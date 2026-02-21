@@ -63,7 +63,7 @@ export default function PhilosopherPage() {
   const name = isHebrew ? philosopher.nameHe : philosopher.nameEn;
   const years = isHebrew ? philosopher.yearsHe : philosopher.yearsEn;
   const oneLiner = isHebrew ? philosopher.summaryHe : philosopher.summaryEn;
-  const fullBio = philosopher.bioHtml;
+  const fullBio = isHebrew ? (philosopher.wikiData?.bioHe || philosopher.bioHtml) : philosopher.bioHtml;
   const imageUrl = philosopher.imageUrl;
   const wikiLink = `https://en.wikipedia.org/wiki/${philosopher.wikiTitle}`;
   const bioHeader = isHebrew ? `על ${name}` : `About ${name}`;
@@ -195,8 +195,8 @@ export default function PhilosopherPage() {
             </h3>
             <p className="text-muted-foreground/80 text-sm">
               {isHebrew
-                ? "אנו עובדים על הוספת ניתוחי עומק, ציטוטים נוספים והקשרים היסטוריים."
-                : "We are working on adding in-depth analysis, more quotes, and historical contexts."}
+                ? "לורם איפסום דולור סיט אמט, קונסקטורר אדיפיסינג אלית. רעיונות על מהות הקיום, חיפוש אחר אמת ומשמעות, ושאלות על תודעה וחירות משתלבים יחד בטקסט המדמה דיון פילוסופי עמוק. סד דיאמ נון ניב אה, אאוגו קומודו ליגולה בלאסטיק מונופול, קוואזי ספקולציות על מוסר, ידיעה וזהות עצמית. אט וולוטפט ולט אילום דולורה, אסתטיקה של מחשבה ביקורתית וחתירה להבנה רחבה יותר של האדם והעולם."
+                : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Concepts of existence, the pursuit of truth and meaning, and reflections on consciousness and free will intertwine in a text that echoes deep philosophical inquiry. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua, weaving speculative thoughts about ethics, knowledge, and personal identity. Ut enim ad minim veniam, cultivating critical thinking and an ever-evolving understanding of humanity and the world."}
             </p>
           </section>
 
