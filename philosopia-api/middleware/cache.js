@@ -64,6 +64,7 @@ export const cache = new MemoryCache();
 
 export function cacheMiddleware(ttl = 300000) {
   return (req, res, next) => {
+    if (process.env.CACHE_ENABLED === 'false') return next();
     if (req.method !== 'GET') return next();
 
     const key = req.originalUrl;

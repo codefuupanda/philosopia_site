@@ -77,7 +77,7 @@ export default [
         titleHe: 'רציונליזם נגד אמפיריציזם',
         descriptionEn: 'Does knowledge come from reason or the senses? The great debate of the modern era.',
         descriptionHe: 'האם הידע מגיע מהתבונה או מהחושים? הוויכוח הגדול של העת החדשה.',
-        philosopherA: 'rene_descartes',
-        philosopherB: 'john_locke'
+        philosopherA: 'descartes',
+        philosopherB: 'locke'
     }
 ];
