@@ -5,7 +5,7 @@ import { useLanguage } from '../i18n/LanguageContext';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
 import { Loader } from '../components/ui/Loader';
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL //|| 'http://localhost:5000/api';
 
 // --- Helper: Wikidata List ---
 const WikidataList = ({ label, items, lang }) => {

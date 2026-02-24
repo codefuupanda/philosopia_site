@@ -5,7 +5,7 @@ import { texts } from "../i18n/texts";
 import axios from "axios";
 import { Loader } from '../components/ui/Loader';
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000/api";
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL //|| "http://localhost:5000/api";
 
 const PhilosopherCard = ({ philosopher, isHebrew }) => (
     <Link

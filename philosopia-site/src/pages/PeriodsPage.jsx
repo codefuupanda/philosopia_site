@@ -15,7 +15,7 @@ import { ScrollArea } from "../components/ui/scroll-area";
 import { Scroll, Quote, BookOpen, ArrowRight, Menu, ChevronRight, ChevronLeft } from 'lucide-react';
 import { Loader } from '../components/ui/Loader';
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL //|| 'http://localhost:5000/api';
 
 export default function PeriodsPage() {
   const { language } = useLanguage();
