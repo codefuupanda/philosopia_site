@@ -17,6 +17,7 @@ import quotesRoutes from "./routes/quotes.js";
 import worksRoutes from "./routes/works.js";
 import requestLogger from "./middleware/requestLogger.js";
 import { cacheMiddleware } from "./middleware/cache.js";
+import healthCheck from "./middleware/healthCheck.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,6 +30,10 @@ if (process.env.USE_CUSTOM_DNS === "true") {
 }
 
 const app = express();
+
+// Health check endpoint (before logger to avoid noisy logs)
+app.get("/api/health", healthCheck);
+
 app.use(cors());
 app.use(express.json());
 app.use(requestLogger);
