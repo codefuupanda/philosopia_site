@@ -15,6 +15,7 @@ import artworkRoutes from "./routes/artworkRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import quotesRoutes from "./routes/quotes.js";
 import worksRoutes from "./routes/works.js";
+import analyticsRoutes from "./routes/analytics.js";
 import requestLogger from "./middleware/requestLogger.js";
 import { cacheMiddleware } from "./middleware/cache.js";
 import healthCheck from "./middleware/healthCheck.js";
@@ -54,6 +55,7 @@ app.use("/api/artworks", artworkRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/quotes", quotesRoutes);
 app.use("/api/works", worksRoutes);
+app.use("/api/analytics", analyticsRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

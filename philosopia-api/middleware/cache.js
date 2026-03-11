@@ -66,6 +66,7 @@ export function cacheMiddleware(ttl = 300000) {
   return (req, res, next) => {
     if (process.env.CACHE_ENABLED === 'false') return next();
     if (req.method !== 'GET') return next();
+    if (req.originalUrl.startsWith('/api/analytics')) return next();
 
     const key = req.originalUrl;
     const cached = cache.get(key);

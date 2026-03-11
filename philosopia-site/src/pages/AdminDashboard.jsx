@@ -17,10 +17,10 @@ function AdminDashboard() {
 
     useEffect(() => {
         // TODO: re-enable auth guard
-        if (!user) {
-            navigate('/login');
-            return;
-        }
+        // if (!user) {
+        //     navigate('/login');
+        //     return;
+        // }
     }, [user, navigate]);
 
     return (

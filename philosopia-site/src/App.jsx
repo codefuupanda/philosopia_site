@@ -8,6 +8,7 @@ import {
   useLocation
 } from "react-router-dom";
 import { useEffect } from "react";
+import tracker from "./utils/tracker";
 
 // --- Pages ---
 import HomePage from "./pages/HomePage";
@@ -44,6 +45,9 @@ function AppShell() {
   const isHebrew = language === "he";
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Initialize analytics tracker
+  useEffect(() => { tracker.init();  }, []);
 
   // Sync language with URL path
   useEffect(() => {
