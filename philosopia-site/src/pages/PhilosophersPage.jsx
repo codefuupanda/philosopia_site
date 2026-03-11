@@ -5,6 +5,7 @@ import { api } from "../lib/api";
 import { texts } from "../i18n/texts";
 import { Brain, ChevronLeft, ChevronRight, LayoutGrid, Clock } from 'lucide-react';
 import { Loader } from '../components/ui/Loader';
+import { AlphaNav } from '../components/AlphaNav';
 
 // Timeline view imports
 import { Card } from "../components/ui/Card";
@@ -24,26 +25,60 @@ function GridView({ lang, isHebrew, t, searchParams, setSearchParams }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [totalPages, setTotalPages] = useState(1);
+  const [activeLetter, setActiveLetter] = useState(null);
+  const [availableLetters, setAvailableLetters] = useState(null); // null = still loading
 
   const page = Math.max(1, parseInt(searchParams.get("page")) || 1);
+
+  // One-time fetch on mount to know which letters have at least one philosopher
+  useEffect(() => {
+    api.getPhilosophers({ page: 1, limit: 500 }).then((data) => {
+      const nameKey = isHebrew ? "nameHe" : "nameEn";
+      const set = new Set(
+        (data.philosophers || [])
+          .map((p) => (p[nameKey] || "").charAt(0).toUpperCase())
+          .filter(Boolean)
+      );
+      setAvailableLetters(set);
+    }).catch(() => {
+      setAvailableLetters(new Set()); // fail open — disable all if fetch fails
+    });
+  }, [isHebrew]);
 
   useEffect(() => {
     const loadPhilosophers = async () => {
       try {
         setLoading(true);
         setError(null);
-        const data = await api.getPhilosophers({ page, limit: PAGE_SIZE });
-        // Deduplicate by id
-        const unique = [];
-        const seen = new Set();
-        for (const p of data.philosophers || []) {
-          if (!seen.has(p.id || p._id)) {
-            seen.add(p.id || p._id);
-            unique.push(p);
+
+        const dedup = (list) => {
+          const unique = [];
+          const seen = new Set();
+          for (const p of list) {
+            if (!seen.has(p.id || p._id)) {
+              seen.add(p.id || p._id);
+              unique.push(p);
+            }
           }
+          return unique;
+        };
+
+        if (activeLetter) {
+          // Fetch all to filter client-side; pagination is suppressed while a letter is active
+          const data = await api.getPhilosophers({ page: 1, limit: 500 });
+          const all = dedup(data.philosophers || []);
+          const filtered = all.filter((p) => {
+            const name = isHebrew ? (p.nameHe || "") : (p.nameEn || "");
+            return name.charAt(0).toUpperCase() === activeLetter;
+          });
+          setPhilosophers(filtered);
+          setTotalPages(1);
+        } else {
+          // Normal paginated fetch — existing behaviour untouched
+          const data = await api.getPhilosophers({ page, limit: PAGE_SIZE });
+          setPhilosophers(dedup(data.philosophers || []));
+          setTotalPages(data.totalPages || 1);
         }
-        setPhilosophers(unique);
-        setTotalPages(data.totalPages || 1);
       } catch (err) {
         console.error("Error loading philosophers:", err);
         setError(isHebrew ? "שגיאה בטעינת רשימת הפילוסופים." : "Error loading philosophers list.");
@@ -53,7 +88,17 @@ function GridView({ lang, isHebrew, t, searchParams, setSearchParams }) {
     };
     loadPhilosophers();
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [page, isHebrew]);
+  }, [page, isHebrew, activeLetter]);
+
+  const handleLetterSelect = useCallback((letter) => {
+    setActiveLetter(letter);
+    // Reset to page 1 whenever the letter filter changes
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set("page", 1);
+      return next;
+    });
+  }, [setSearchParams]);
 
   const goToPage = useCallback((p) => {
     setSearchParams((prev) => {
@@ -97,6 +142,30 @@ function GridView({ lang, isHebrew, t, searchParams, setSearchParams }) {
 
   return (
     <div dir={isHebrew ? 'rtl' : 'ltr'} className="container max-w-6xl mx-auto py-12 px-4">
+
+      {/* Alphabetical Filter Bar */}
+      <div className="mb-8 pb-6 border-b border-border">
+        <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
+          {t.alpha_filter_label}
+        </p>
+        <AlphaNav
+          lang={lang}
+          isHebrew={isHebrew}
+          activeLetter={activeLetter}
+          onSelectLetter={handleLetterSelect}
+          availableLetters={availableLetters}
+          allLabel={t.alpha_all}
+          ariaLabel={t.alpha_filter_label}
+        />
+      </div>
+
+      {/* Empty state when no results for the chosen letter */}
+      {philosophers.length === 0 && !loading && (
+        <div className="py-20 text-center text-muted-foreground text-sm italic">
+          {t.alpha_no_results}
+        </div>
+      )}
+
       {/* Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {philosophers.map((phil) => (
@@ -156,8 +225,8 @@ function GridView({ lang, isHebrew, t, searchParams, setSearchParams }) {
         ))}
       </div>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
+      {/* Pagination — hidden while a letter filter is active */}
+      {!activeLetter && totalPages > 1 && (
         <nav className="flex items-center justify-center gap-2 mt-12">
           <button
             onClick={() => goToPage(page - 1)}

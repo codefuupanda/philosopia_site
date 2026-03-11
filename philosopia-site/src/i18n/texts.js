@@ -62,6 +62,9 @@ export const texts = {
     next_page: "הבא",
     view_grid: "הצג פילוסופים",
     view_timeline: "הצג ציר זמן",
+    alpha_all: "הכל",
+    alpha_filter_label: "סנן לפי אות",
+    alpha_no_results: "לא נמצאו פילוסופים עבור אות זו.",
   },
   en: {
     // מפתחות קיימים
@@ -126,5 +129,8 @@ export const texts = {
     next_page: "Next",
     view_grid: "Show Philosophers",
     view_timeline: "Show Timeline",
+    alpha_all: "All",
+    alpha_filter_label: "Filter by letter",
+    alpha_no_results: "No philosophers found for this letter.",
   },
 };
