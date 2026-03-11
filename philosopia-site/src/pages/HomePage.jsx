@@ -15,6 +15,7 @@ import { api } from "../lib/api";
 import { Logo } from "../components/ui/Logo";
 import { Loader } from '../components/ui/Loader';
 import { cn } from "../lib/utils";
+import AboutSection from "../components/AboutSection";
 
 function HomePage() {
   const { language } = useLanguage();
@@ -55,8 +56,8 @@ function HomePage() {
     <div className="space-y-16 pb-20">
 
       {/* 1. HERO SECTION */}
-      <section className="relative min-h-[70vh] flex flex-col items-center justify-center overflow-hidden rounded-3xl bg-background border border-amber-500/30 p-8 md:p-16 text-center shadow-2xl shadow-amber-900/10">
-        {/* Abstract Background Visual */}
+      
+      {/*<section className="relative min-h-[70vh] flex flex-col items-center justify-center overflow-hidden rounded-3xl bg-background border border-amber-500/30 p-8 md:p-16 text-center shadow-2xl shadow-amber-900/10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-amber-500/10 via-background to-background"></div>
         <div className="absolute inset-0 opacity-30 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] [background-size:16px_16px]"></div>
 
@@ -87,9 +88,12 @@ function HomePage() {
             </Link>
           </div>
         </div>
-      </section>
+      </section>*/}
 
-      {/* 2. BENTO GRID */}
+      {/* 2. ABOUT SECTION */}
+      <AboutSection />
+
+      {/* 3. BENTO GRID */}
       <section className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-4 max-w-7xl mx-auto px-4 h-auto md:h-[600px]">
 
         {/* SLOT 1: Philosopher Spotlight (2x2) */}
@@ -192,7 +196,7 @@ function HomePage() {
       </section>
 
       {/* 4. THE STOA (Quotes Gateway) */}
-      <section className="py-20 text-center px-4 bg-gradient-to-b from-transparent to-muted/20">
+      {/*<section className="py-20 text-center px-4 bg-gradient-to-b from-transparent to-muted/20">
         <div className="max-w-2xl mx-auto space-y-8">
           <Quote className="w-12 h-12 text-amber-500/50 mx-auto" />
           <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground">
@@ -212,7 +216,7 @@ function HomePage() {
             ))}
           </div>
         </div>
-      </section>
+      </section>*/}
 
     </div>
   );

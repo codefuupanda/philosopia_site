@@ -26,6 +26,16 @@ export const texts = {
     hero_subtext: "גם החכמה כשהיא מסודרת.",
     hero_cta_primary: "לצאת מהמערה",
 
+    // About Section
+    about_section_title: "מה זה Philosopia?",
+    about_section_text: "Philosopia הוא מדריך אינטראקטיבי להיסטוריה של הפילוסופיה. כאן תמצאו פילוסופים, אסכולות מחשבה, מושגים מרכזיים, ויכוחים היסטוריים, ואת הקשרים ביניהם – הכל בעברית ובאנגלית. האתר נבנה כדי להנגיש את עולם הפילוסופיה לכל מי שסקרן.",
+    about_section_features: [
+      "פרופילים מפורטים של עשרות פילוסופים מכל התקופות",
+      "אסכולות מחשבה – מהסטואיקנים ועד האקזיסטנציאליסטים",
+      "הוויכוחים הגדולים שעיצבו את המחשבה האנושית",
+      "מושגי יסוד בפילוסופיה בהסבר נגיש",
+    ],
+
     // Bento Grid
     bento_timeline_title: "ציר הזמן",
     bento_timeline_desc: "מסע כרונולוגי",
@@ -92,6 +102,16 @@ export const texts = {
     hero_headline: "Everything Is Beautiful in Its Time.",
     hero_subtext: "So is wisdom when it’s organized.",
     hero_cta_primary: "Step Out of the Cave",
+
+    // About Section
+    about_section_title: "What is Philosopia?",
+    about_section_text: "Philosopia is an interactive guide to the history of philosophy. Here you'll find philosophers, schools of thought, key concepts, historical debates, and the connections between them – all in English and Hebrew. This site was built to make the world of philosophy accessible to anyone who's curious.",
+    about_section_features: [
+      "Detailed profiles of dozens of philosophers across all eras",
+      "Schools of thought – from the Stoics to the Existentialists",
+      "The great debates that shaped human thought",
+      "Core philosophical concepts explained accessibly",
+    ],
 
     // Bento Grid
     bento_timeline_title: "Timeline",
