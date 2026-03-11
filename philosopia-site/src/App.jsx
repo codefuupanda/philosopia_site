@@ -137,39 +137,22 @@ function AppShell() {
       <main className="flex-1 flex justify-center py-8 px-4">
         <div className="w-full max-w-[1600px]">
           <Routes>
-            {/* Hebrew Routes */}
-            <Route path="/he" element={<HomePage />} />
-            <Route path="/he/periods" element={<Navigate to="/he/philosophers?view=timeline" replace />} />
-            <Route path="/he/periods/:periodId" element={<PeriodDetailPage />} />
-            <Route path="/he/philosophers" element={<PhilosophersPage />} />
-            <Route path="/he/philosophers/:id" element={<PhilosopherPage />} />
-            <Route path="/he/about" element={<AboutPage />} />
-            <Route path="/he/beefs" element={<BeefsPage />} />
-            <Route path="/he/beefs/:id" element={<BeefDetailPage />} />
-            <Route path="/he/schools" element={<SchoolsPage />} />
-            <Route path="/he/schools/:id" element={<SchoolDetailsPage />} />
-            <Route path="/he/concepts" element={<ConceptsPage />} />
-            <Route path="/he/concepts/:id" element={<ConceptDetailPage />} />
-            {/* <Route path="/he/works" element={<WorksPage />} /> */}
-            {/* <Route path="/he/quotes" element={<QuotesPage />} /> */}
-            <Route path="/he/art-and-philo" element={<ArtAndPhiloPage />} />
-
-            {/* English Routes */}
-            <Route path="/en" element={<HomePage />} />
-            <Route path="/en/periods" element={<Navigate to="/en/philosophers?view=timeline" replace />} />
-            <Route path="/en/periods/:periodId" element={<PeriodDetailPage />} />
-            <Route path="/en/philosophers" element={<PhilosophersPage />} />
-            <Route path="/en/philosophers/:id" element={<PhilosopherPage />} />
-            <Route path="/en/about" element={<AboutPage />} />
-            <Route path="/en/beefs" element={<BeefsPage />} />
-            <Route path="/en/beefs/:id" element={<BeefDetailPage />} />
-            <Route path="/en/schools" element={<SchoolsPage />} />
-            <Route path="/en/schools/:id" element={<SchoolDetailsPage />} />
-            <Route path="/en/concepts" element={<ConceptsPage />} />
-            <Route path="/en/concepts/:id" element={<ConceptDetailPage />} />
-            {/* <Route path="/en/works" element={<WorksPage />} /> */}
-            {/* <Route path="/en/quotes" element={<QuotesPage />} /> */}
-            <Route path="/en/art-and-philo" element={<ArtAndPhiloPage />} />
+            {/* Language Routes */}
+            <Route path="/:lang" element={<HomePage />} />
+            <Route path="/:lang/periods" element={<Navigate to={`${basePath}/philosophers?view=timeline`} replace />} />
+            <Route path="/:lang/periods/:periodId" element={<PeriodDetailPage />} />
+            <Route path="/:lang/philosophers" element={<PhilosophersPage />} />
+            <Route path="/:lang/philosophers/:id" element={<PhilosopherPage />} />
+            <Route path="/:lang/about" element={<AboutPage />} />
+            <Route path="/:lang/beefs" element={<BeefsPage />} />
+            <Route path="/:lang/beefs/:id" element={<BeefDetailPage />} />
+            <Route path="/:lang/schools" element={<SchoolsPage />} />
+            <Route path="/:lang/schools/:id" element={<SchoolDetailsPage />} />
+            <Route path="/:lang/concepts" element={<ConceptsPage />} />
+            <Route path="/:lang/concepts/:id" element={<ConceptDetailPage />} />
+            {/* <Route path="/:lang/works" element={<WorksPage />} /> */}
+            {/* <Route path="/:lang/quotes" element={<QuotesPage />} /> */}
+            <Route path="/:lang/art-and-philo" element={<ArtAndPhiloPage />} />
 
             {/* Admin Routes */}
             <Route path="/login" element={<LoginPage />} />
