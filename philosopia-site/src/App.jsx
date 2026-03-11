@@ -71,8 +71,8 @@ function AppShell() {
     { to: `${basePath}/schools`, label: t.navSchools },
     { to: `${basePath}/concepts`, label: t.navConcepts },
     { to: `${basePath}/beefs`, label: t.navBeefs },
-    { to: `${basePath}/works`, label: t.navWorks },
-    { to: `${basePath}/quotes`, label: t.navQuotes },
+    // { to: `${basePath}/works`, label: t.navWorks },
+    // { to: `${basePath}/quotes`, label: t.navQuotes },
     { to: `${basePath}/art-and-philo`, label: t.navArtAndPhilo },
     { to: `${basePath}/about`, label: t.navAbout },
   ];
@@ -150,8 +150,8 @@ function AppShell() {
             <Route path="/he/schools/:id" element={<SchoolDetailsPage />} />
             <Route path="/he/concepts" element={<ConceptsPage />} />
             <Route path="/he/concepts/:id" element={<ConceptDetailPage />} />
-            <Route path="/he/works" element={<WorksPage />} />
-            <Route path="/he/quotes" element={<QuotesPage />} />
+            {/* <Route path="/he/works" element={<WorksPage />} /> */}
+            {/* <Route path="/he/quotes" element={<QuotesPage />} /> */}
             <Route path="/he/art-and-philo" element={<ArtAndPhiloPage />} />
 
             {/* English Routes */}
@@ -167,8 +167,8 @@ function AppShell() {
             <Route path="/en/schools/:id" element={<SchoolDetailsPage />} />
             <Route path="/en/concepts" element={<ConceptsPage />} />
             <Route path="/en/concepts/:id" element={<ConceptDetailPage />} />
-            <Route path="/en/works" element={<WorksPage />} />
-            <Route path="/en/quotes" element={<QuotesPage />} />
+            {/* <Route path="/en/works" element={<WorksPage />} /> */}
+            {/* <Route path="/en/quotes" element={<QuotesPage />} /> */}
             <Route path="/en/art-and-philo" element={<ArtAndPhiloPage />} />
 
             {/* Admin Routes */}
