@@ -13,6 +13,7 @@ export default function AboutPage() {
     { name: "MongoDB", icon: "🍃", desc: "Database" },
     { name: "Wikidata & Wikipedia", icon: "🌐", desc: "Data Enrichment" },
     { name: "Tailwind CSS", icon: "🎨", desc: "Styling" },
+    { name: "Docker", icon: "🐳", desc: "Containerization" },
   ];
 
   return (
@@ -54,7 +55,7 @@ export default function AboutPage() {
         <h2 className="text-2xl font-bold mb-6 text-center text-foreground">
           {isHebrew ? "טכנולוגיות הפיתוח" : "Tech Stack"}
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {techStack.map((tech) => (
             <div key={tech.name} className="bg-card border border-amber-500 rounded-xl p-4 text-center hover:bg-muted hover:border-primary/50 transition-all duration-300">
               <div className="text-3xl mb-2">{tech.icon}</div>
