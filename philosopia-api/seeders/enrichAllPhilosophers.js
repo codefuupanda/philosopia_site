@@ -1,11 +1,7 @@
-import mongoose from 'mongoose';
 import axios from 'axios';
-import dotenv from 'dotenv';
 import colors from 'colors';
-import Philosopher from '../models/Philosopher.js';
+import { listByType, put } from '../db/content.js';
 import { getWikidataRelationships } from './universalEnricher.js';
-
-dotenv.config();
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -27,15 +23,12 @@ const getQidFromTitle = async (title) => {
 
 const enrichAll = async () => {
     try {
-        await mongoose.connect(process.env.MONGO_URI);
-        console.log('🔌 Connected to MongoDB'.cyan.bold);
-
-        const philosophers = await Philosopher.find({});
+        const philosophers = await listByType('philosopher');
         console.log(`Found ${philosophers.length} philosophers to check...`.cyan);
 
         for (const p of philosophers) {
             await delay(1000); // Wait 1 second between philosophers
-            const pName = p.name?.en || p.nameEn;
+            const pName = p.name?.en;
             console.log(`\nProcessing ${pName}...`.yellow);
 
             // 1. Ensure we have a QID
@@ -57,8 +50,6 @@ const enrichAll = async () => {
             try {
                 const enrichedData = await getWikidataRelationships(p.wikiQid, p.wikiTitle || pName);
 
-                // Update fields
-
                 // Images: Separate manual from enriched
                 if (enrichedData.imageUrl) {
                     p.enrichedImageUrl = enrichedData.imageUrl;
@@ -73,15 +64,15 @@ const enrichAll = async () => {
                     p.wikiData.bioHe = enrichedData.bioHtmlHe;
                 }
 
-                if (enrichedData.influencedBy && enrichedData.influencedBy.length > 0) p.influencedBy = enrichedData.influencedBy;
-                if (enrichedData.students && enrichedData.students.length > 0) p.students = enrichedData.students;
-                if (enrichedData.countryOfCitizenship && enrichedData.countryOfCitizenship.length > 0) p.countryOfCitizenship = enrichedData.countryOfCitizenship;
-                if (enrichedData.foundationalTexts && enrichedData.foundationalTexts.length > 0) p.foundationalTexts = enrichedData.foundationalTexts;
-                if (enrichedData.religion && enrichedData.religion.length > 0) p.religion = enrichedData.religion;
+                if (enrichedData.influencedBy?.length > 0) p.influencedBy = enrichedData.influencedBy;
+                if (enrichedData.students?.length > 0) p.students = enrichedData.students;
+                if (enrichedData.countryOfCitizenship?.length > 0) p.countryOfCitizenship = enrichedData.countryOfCitizenship;
+                if (enrichedData.foundationalTexts?.length > 0) p.foundationalTexts = enrichedData.foundationalTexts;
+                if (enrichedData.religion?.length > 0) p.religion = enrichedData.religion;
 
-                p.lastEnriched = new Date();
+                p.lastEnriched = new Date().toISOString();
 
-                await p.save();
+                await put(p); // full-item overwrite of the same (entityType, id)
                 console.log(`  - ✅ Successfully enriched and saved.`.green);
 
             } catch (err) {

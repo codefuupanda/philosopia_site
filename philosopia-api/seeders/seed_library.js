@@ -1,11 +1,5 @@
-import mongoose from "mongoose";
-import dotenv from "dotenv";
 import colors from "colors";
-import Philosopher from "../models/Philosopher.js";
-import Work from "../models/Work.js";
-import Quote from "../models/Quote.js";
-
-dotenv.config();
+import { listByType, putMany } from "../db/content.js";
 
 const libraryData = [
     {
@@ -192,55 +186,44 @@ const libraryData = [
 
 const seedLibrary = async () => {
     try {
-        await mongoose.connect(process.env.MONGO_URI);
-        console.log("🔌 Connected to MongoDB".cyan.bold);
+        // Fetch all philosophers to validate references
+        const allPhilosophers = await listByType('philosopher');
+        const validIds = new Set(allPhilosophers.map((p) => p.id));
 
-        // Clear existing
-        console.log("🧹 Clearing Works and Quotes...".yellow);
-        await Work.deleteMany({});
-        await Quote.deleteMany({});
+        const works = new Map(); // dedupe by work id (e.g. Analects appears twice)
+        const quotes = [];
 
-        // Fetch all philosophers for mapping
-        const allPhilosophers = await Philosopher.find();
-
-        for (const item of libraryData) {
-            const philosopher = allPhilosophers.find(p => p.id === item.philosopherId);
-
-            if (!philosopher) {
+        libraryData.forEach((item, idx) => {
+            if (!validIds.has(item.philosopherId)) {
                 console.warn(`WARNING: Philosopher '${item.philosopherId}' not found. Skipping.`.red);
-                continue;
+                return;
             }
 
-            // Create Work
-            console.log(`Creating Work: ${item.work.title.en}...`);
-            const work = await Work.create({
+            // Work (relations by string id; Put overwrites → idempotent)
+            works.set(item.work.id, {
+                entityType: 'work',
                 id: item.work.id,
                 title: item.work.title,
                 philosopherId: item.philosopherId,
-                philosopher: philosopher._id,
                 publicationYear: item.work.publicationYear,
                 wikiLink: item.work.wikiLink,
-
-                // Deprecated fields support
-                titleEn: item.work.title.en,
-                titleHe: item.work.title.he
             });
 
-            // Create Quote
-            console.log(`Creating Quote by ${item.philosopherId}...`);
-            await Quote.create({
+            // Quote — quotes had no natural id in Mongo; mint a stable deterministic one
+            quotes.push({
+                entityType: 'quote',
+                id: `q_${item.philosopherId}_${idx}`,
                 content: item.quote.content,
                 philosopherId: item.philosopherId,
-                philosopher: philosopher._id,
-                workId: work.id,
-                work: work._id,
+                workId: item.work.id,
                 tags: item.quote.tags,
-
-                // Deprecated fields support
-                contentEn: item.quote.content.en,
-                contentHe: item.quote.content.he
             });
-        }
+        });
+
+        await putMany([...works.values()]);
+        console.log(`✅ ${works.size} Works seeded`.green);
+        await putMany(quotes);
+        console.log(`✅ ${quotes.length} Quotes seeded`.green);
 
         console.log("✅ Library Seeded".green.bold);
         process.exit(0);

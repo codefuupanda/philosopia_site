@@ -4,10 +4,12 @@ import colors from 'colors';
 // List of scripts in the exact execution order
 const scripts = [
     { name: '1. Basic Philosophers (Skeleton)', path: 'seeders/seeder.js' },
-    { name: '2. Web Enrichment (Images & Bios)', path: 'seeders/enrichAllPhilosophers.js' }, // The crucial file that fetches from the internet
-    { name: '3. Library (Works & Quotes)', path: 'seeders/seed_library.js' },
-    { name: '4. Additional Quotes', path: 'seeders/quoteSeeder.js' },
-    { name: '5. Artworks', path: 'seeders/artworkSeeder.js' }
+    { name: '2. Library (Works & Quotes)', path: 'seeders/seed_library.js' },
+    { name: '3. Additional Quotes', path: 'seeders/quoteSeeder.js' },
+    { name: '4. Artworks', path: 'seeders/artworkSeeder.js' },
+    // Enrichment runs LAST: it reads each philosopher item and writes it back whole,
+    // so all other philosopher mutations (quotes) must land first.
+    { name: '5. Web Enrichment (Images & Bios)', path: 'seeders/enrichAllPhilosophers.js' } // Fetches from the internet (slow)
 ];
 
 console.log('🏛️  STARTING PHILOSOPIA MASTER SEED 🏛️'.bgWhite.black.bold);

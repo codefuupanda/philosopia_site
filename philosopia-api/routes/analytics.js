@@ -1,5 +1,5 @@
 import express from 'express';
-import AnalyticsEvent from '../models/AnalyticsEvent.js';
+import { putEvents, queryLastDays } from '../db/analytics.js';
 
 const router = express.Router();
 
@@ -29,8 +29,8 @@ router.post('/events', async (req, res) => {
       timestamp: new Date(),
     }));
 
-    await AnalyticsEvent.insertMany(docs, { ordered: false });
-    res.status(201).json({ received: docs.length });
+    const received = await putEvents(docs);
+    res.status(201).json({ received });
   } catch (err) {
     console.error('Analytics ingest error:', err.message);
     res.status(500).json({ message: 'Failed to store events' });
@@ -39,106 +39,92 @@ router.post('/events', async (req, res) => {
 
 // ─── Dashboard Stats ─────────────────────────────────────────────
 // GET /api/analytics/stats?days=7
+// One Query per day partition, then the aggregations run in app code.
+// Response shape is identical to the old Mongo aggregation version.
 router.get('/stats', async (req, res) => {
   try {
     const days = Math.min(parseInt(req.query.days) || 7, 90);
     const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 
-    const [
-      pageViewsByPage,
-      totalPageviews,
-      avgTimeByPage,
-      bounceData,
-      exitPages,
-      topEvents,
-      dailyPageviews,
-    ] = await Promise.all([
-      // Page views per page
-      AnalyticsEvent.aggregate([
-        { $match: { type: 'pageview', timestamp: { $gte: since } } },
-        { $group: { _id: '$page', views: { $sum: 1 } } },
-        { $sort: { views: -1 } },
-        { $limit: 20 },
-      ]),
+    const events = (await queryLastDays(days))
+      .filter((e) => new Date(e.timestamp) >= since);
 
-      // Total pageviews
-      AnalyticsEvent.countDocuments({ type: 'pageview', timestamp: { $gte: since } }),
+    const pageviews = events.filter((e) => e.type === 'pageview');
+    const exits = events.filter((e) => e.type === 'exit');
+    const custom = events.filter((e) => e.type === 'event');
 
-      // Average time on page (from exit events that have timeOnPage)
-      AnalyticsEvent.aggregate([
-        { $match: { type: 'exit', timeOnPage: { $gt: 0 }, timestamp: { $gte: since } } },
-        { $group: { _id: '$page', avgTime: { $avg: '$timeOnPage' }, count: { $sum: 1 } } },
-        { $sort: { count: -1 } },
-        { $limit: 20 },
-      ]),
+    const countBy = (items, keyFn) => {
+      const m = new Map();
+      for (const it of items) {
+        const k = keyFn(it);
+        m.set(k, (m.get(k) || 0) + 1);
+      }
+      return m;
+    };
 
-      // Bounce rate: sessions with only 1 pageview
-      AnalyticsEvent.aggregate([
-        { $match: { type: 'pageview', timestamp: { $gte: since } } },
-        { $group: { _id: '$sessionId', pageCount: { $sum: 1 } } },
-        {
-          $group: {
-            _id: null,
-            totalSessions: { $sum: 1 },
-            bouncedSessions: { $sum: { $cond: [{ $eq: ['$pageCount', 1] }, 1, 0] } },
-          },
-        },
-      ]),
+    // Page views per page (top 20)
+    const pageViews = [...countBy(pageviews, (e) => e.page)]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 20)
+      .map(([page, views]) => ({ page, views }));
 
-      // Exit pages
-      AnalyticsEvent.aggregate([
-        { $match: { type: 'exit', timestamp: { $gte: since } } },
-        { $group: { _id: '$page', exits: { $sum: 1 } } },
-        { $sort: { exits: -1 } },
-        { $limit: 10 },
-      ]),
+    // Average time on page (from exit events that have timeOnPage), top 20 by samples
+    const timeAgg = new Map();
+    for (const e of exits) {
+      if (typeof e.timeOnPage === 'number' && e.timeOnPage > 0) {
+        const agg = timeAgg.get(e.page) || { sum: 0, count: 0 };
+        agg.sum += e.timeOnPage;
+        agg.count += 1;
+        timeAgg.set(e.page, agg);
+      }
+    }
+    const avgTimeOnPage = [...timeAgg]
+      .sort((a, b) => b[1].count - a[1].count)
+      .slice(0, 20)
+      .map(([page, { sum, count }]) => ({
+        page,
+        avgTimeMs: Math.round(sum / count),
+        avgTimeSec: Math.round(sum / count / 1000),
+        samples: count,
+      }));
 
-      // Top custom events
-      AnalyticsEvent.aggregate([
-        { $match: { type: 'event', timestamp: { $gte: since } } },
-        {
-          $group: {
-            _id: { category: '$eventCategory', action: '$eventAction', label: '$eventLabel' },
-            count: { $sum: 1 },
-          },
-        },
-        { $sort: { count: -1 } },
-        { $limit: 20 },
-      ]),
-
-      // Daily pageview trend
-      AnalyticsEvent.aggregate([
-        { $match: { type: 'pageview', timestamp: { $gte: since } } },
-        {
-          $group: {
-            _id: { $dateToString: { format: '%Y-%m-%d', date: '$timestamp' } },
-            views: { $sum: 1 },
-          },
-        },
-        { $sort: { _id: 1 } },
-      ]),
-    ]);
-
-    const bounce = bounceData[0] || { totalSessions: 0, bouncedSessions: 0 };
-    const bounceRate = bounce.totalSessions > 0
-      ? Math.round((bounce.bouncedSessions / bounce.totalSessions) * 100)
+    // Bounce rate: sessions with only 1 pageview
+    const bySession = countBy(pageviews, (e) => e.sessionId);
+    const totalSessions = bySession.size;
+    const bouncedSessions = [...bySession.values()].filter((n) => n === 1).length;
+    const bounceRate = totalSessions > 0
+      ? Math.round((bouncedSessions / totalSessions) * 100)
       : 0;
+
+    // Exit pages (top 10)
+    const exitPages = [...countBy(exits, (e) => e.page)]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([page, count]) => ({ page, exits: count }));
+
+    // Top custom events (top 20)
+    const topEvents = [...countBy(custom, (e) =>
+      JSON.stringify({ category: e.eventCategory, action: e.eventAction, label: e.eventLabel })
+    )]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 20)
+      .map(([key, count]) => ({ ...JSON.parse(key), count }));
+
+    // Daily pageview trend (ascending by date)
+    const dailyTrend = [...countBy(pageviews, (e) => e.day)]
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([date, views]) => ({ date, views }));
 
     res.json({
       period: { days, since },
-      totalPageviews,
+      totalPageviews: pageviews.length,
       bounceRate,
-      totalSessions: bounce.totalSessions,
-      pageViews: pageViewsByPage.map((p) => ({ page: p._id, views: p.views })),
-      avgTimeOnPage: avgTimeByPage.map((p) => ({
-        page: p._id,
-        avgTimeMs: Math.round(p.avgTime),
-        avgTimeSec: Math.round(p.avgTime / 1000),
-        samples: p.count,
-      })),
-      exitPages: exitPages.map((p) => ({ page: p._id, exits: p.exits })),
-      topEvents: topEvents.map((e) => ({ ...e._id, count: e.count })),
-      dailyTrend: dailyPageviews.map((d) => ({ date: d._id, views: d.views })),
+      totalSessions,
+      pageViews,
+      avgTimeOnPage,
+      exitPages,
+      topEvents,
+      dailyTrend,
     });
   } catch (err) {
     console.error('Analytics stats error:', err.message);

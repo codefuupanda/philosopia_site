@@ -1,10 +1,7 @@
-import path from "path";
-import { fileURLToPath } from "url";
-import dns from "dns";
 import express from "express";
 import cors from "cors";
-import mongoose from "mongoose";
-import dotenv from "dotenv";
+import { DescribeTableCommand } from "@aws-sdk/client-dynamodb";
+import { rawClient, TABLES } from "./db/client.js";
 
 import philosophersRoutes from "./routes/philosophers.js";
 import periodsRoutes from "./routes/periods.js";
@@ -20,15 +17,7 @@ import requestLogger from "./middleware/requestLogger.js";
 import { cacheMiddleware } from "./middleware/cache.js";
 import healthCheck from "./middleware/healthCheck.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-dotenv.config({ path: path.join(__dirname, ".env") });
-
-if (process.env.USE_CUSTOM_DNS === "true") {
-  dns.setServers(["8.8.8.8", "8.8.4.4"]);
-  console.log("Using custom DNS servers (Google DNS)");
-}
+// .env is loaded by db/client.js (works regardless of cwd)
 
 const app = express();
 
@@ -40,10 +29,10 @@ app.use(express.json());
 app.use(requestLogger);
 app.use(cacheMiddleware(5 * 60 * 1000)); // 5 minute TTL
 
-// Database Connection
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ Connected to MongoDB"))
-  .catch((err) => console.error("❌ MongoDB Connection Error:", err));
+// Database connectivity check (non-fatal — requests surface their own errors)
+rawClient.send(new DescribeTableCommand({ TableName: TABLES.content }))
+  .then(() => console.log(`✅ Connected to DynamoDB (${process.env.AWS_REGION || 'us-east-1'})`))
+  .catch((err) => console.error("❌ DynamoDB connection error:", err.name, err.message));
 
 // API routes
 app.use("/api/philosophers", philosophersRoutes);

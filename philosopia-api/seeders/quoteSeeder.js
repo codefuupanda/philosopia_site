@@ -1,41 +1,39 @@
-import mongoose from "mongoose";
-import dotenv from "dotenv";
 import colors from "colors";
-import Philosopher from "../models/Philosopher.js";
+import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import { ddb, TABLES } from "../db/client.js";
 import quotesData from "../data/quotes.js";
 
-dotenv.config();
+// Injects the quotes arrays onto existing philosopher items (nested { en, he }).
 
 const seedQuotes = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
     console.log("💬 Starting Comprehensive Quote Injection...".magenta.bold);
 
     let updatedCount = 0;
 
     for (const data of quotesData) {
-      const update = {
-        quotes: { en: data.quotesEn, he: data.quotesHe },
-        quotesEn: data.quotesEn,
-        quotesHe: data.quotesHe
-      };
-
-      const phil = await Philosopher.findOneAndUpdate(
-        { id: data.philosopherId },
-        update,
-        { new: true }
-      );
-
-      if (phil) {
-        console.log(`✅ Updated quotes for: ${phil.nameEn}`.green);
+      try {
+        const res = await ddb.send(new UpdateCommand({
+          TableName: TABLES.content,
+          Key: { entityType: "philosopher", id: data.philosopherId },
+          UpdateExpression: "SET quotes = :q",
+          ConditionExpression: "attribute_exists(id)", // don't create ghost items
+          ExpressionAttributeValues: { ":q": { en: data.quotesEn, he: data.quotesHe } },
+          ReturnValues: "ALL_NEW",
+        }));
+        console.log(`✅ Updated quotes for: ${res.Attributes?.name?.en}`.green);
         updatedCount++;
-      } else {
-        console.log(`❌ Philosopher not found: ${data.philosopherId}`.red);
+      } catch (e) {
+        if (e.name === "ConditionalCheckFailedException") {
+          console.log(`❌ Philosopher not found: ${data.philosopherId}`.red);
+        } else {
+          throw e;
+        }
       }
     }
 
     console.log(`\nDone! Updated ${updatedCount} philosophers.`.green.bold);
-    process.exit();
+    process.exit(0);
 
   } catch (err) {
     console.error(err);

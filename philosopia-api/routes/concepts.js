@@ -1,15 +1,32 @@
 import express from "express";
-import Concept from "../models/Concept.js";
+import { listByType, getById, getByIds } from "../db/content.js";
+import { withFlatAliases } from "../db/aliases.js";
 
 const router = express.Router();
+
+// Attach relatedPhilosophers objects to concepts by joining on string ids.
+async function attachPhilosophers(concepts, { includeSummary = false } = {}) {
+  const ids = concepts.flatMap((c) => c.relatedPhilosopherIds || []);
+  const byId = await getByIds("philosopher", ids);
+  return concepts.map((c) => ({
+    ...withFlatAliases("concept", c),
+    relatedPhilosophers: (c.relatedPhilosopherIds || [])
+      .map((id) => byId.get(id))
+      .filter(Boolean)
+      .map((p) => withFlatAliases("philosopher", {
+        id: p.id,
+        name: p.name,
+        imageUrl: p.imageUrl,
+        ...(includeSummary ? { summary: p.summary } : {}),
+      })),
+  }));
+}
 
 // GET /api/concepts (All concepts)
 router.get("/", async (req, res) => {
   try {
-    const concepts = await Concept.find()
-      .populate('relatedPhilosophers', 'id nameEn nameHe imageUrl');
-
-    res.json({ concepts });
+    const concepts = await listByType("concept");
+    res.json({ concepts: await attachPhilosophers(concepts) });
   } catch (error) {
     res.status(500).json({ error: "Server Error" });
   }
@@ -18,11 +35,10 @@ router.get("/", async (req, res) => {
 // GET /api/concepts/:id (Specific concept)
 router.get("/:id", async (req, res) => {
   try {
-    const concept = await Concept.findOne({ id: req.params.id })
-      .populate('relatedPhilosophers', 'id nameEn nameHe imageUrl summaryEn summaryHe');
-
+    const concept = await getById("concept", req.params.id);
     if (!concept) return res.status(404).json({ error: "Concept not found" });
-    res.json({ concept });
+    const [withPhils] = await attachPhilosophers([concept], { includeSummary: true });
+    res.json({ concept: withPhils });
   } catch (error) {
     res.status(500).json({ error: "Server Error" });
   }

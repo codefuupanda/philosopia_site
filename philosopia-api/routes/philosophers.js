@@ -1,6 +1,6 @@
 import express from "express";
-import Philosopher from "../models/Philosopher.js";
-import Concept from "../models/Concept.js";
+import { listByType, getById } from "../db/content.js";
+import { withFlatAliases, withFlatAliasesList } from "../db/aliases.js";
 
 const router = express.Router();
 
@@ -8,34 +8,33 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   try {
     const { ids, periodId, page, limit: limitParam } = req.query;
-    let query = {};
+
+    let philosophers = await listByType("philosopher");
 
     if (ids) {
-      const idList = ids.split(",");
-      query.id = { $in: idList };
+      const idSet = new Set(ids.split(","));
+      philosophers = philosophers.filter((p) => idSet.has(p.id));
     }
 
     if (periodId) {
-      query.periodId = periodId;
+      philosophers = philosophers.filter((p) => p.periodId === periodId);
     }
+
+    philosophers.sort((a, b) => (a.name?.en || "").localeCompare(b.name?.en || ""));
+    philosophers = withFlatAliasesList("philosopher", philosophers);
 
     // If no pagination params, return all (backward compatible)
     if (!page && !limitParam) {
-      const philosophers = await Philosopher.find(query).sort({ nameEn: 1 });
       return res.json({ philosophers, total: philosophers.length });
     }
 
     const pageNum = Math.max(1, parseInt(page) || 1);
     const limit = Math.max(1, Math.min(100, parseInt(limitParam) || 12));
-    const skip = (pageNum - 1) * limit;
-
-    const [philosophers, total] = await Promise.all([
-      Philosopher.find(query).sort({ nameEn: 1 }).skip(skip).limit(limit),
-      Philosopher.countDocuments(query),
-    ]);
+    const total = philosophers.length;
+    const start = (pageNum - 1) * limit;
 
     res.json({
-      philosophers,
+      philosophers: philosophers.slice(start, start + limit),
       total,
       page: pageNum,
       totalPages: Math.ceil(total / limit),
@@ -50,18 +49,21 @@ router.get("/", async (req, res) => {
 // GET /api/philosophers/:id (Detail + Linked Concepts)
 router.get("/:id", async (req, res) => {
   try {
-    const philosopher = await Philosopher.findOne({ id: req.params.id });
+    const philosopher = await getById("philosopher", req.params.id);
 
     if (!philosopher) {
       return res.status(404).json({ error: "Philosopher not found" });
     }
 
-    const linkedConcepts = await Concept.find({ relatedPhilosophers: philosopher._id })
-      .select('id nameEn nameHe summaryEn summaryHe');
+    // Concepts link back to philosophers by string business id
+    const concepts = await listByType("concept");
+    const linkedConcepts = concepts
+      .filter((c) => (c.relatedPhilosopherIds || []).includes(philosopher.id))
+      .map((c) => withFlatAliases("concept", { id: c.id, name: c.name, summary: c.summary }));
 
     res.json({
-        philosopher,
-        linkedConcepts
+      philosopher: withFlatAliases("philosopher", philosopher),
+      linkedConcepts,
     });
 
   } catch (error) {

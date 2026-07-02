@@ -1,50 +1,44 @@
-import mongoose from "mongoose";
-import dotenv from "dotenv";
 import colors from "colors";
-import Artwork from "../models/Artwork.js";
-import Philosopher from "../models/Philosopher.js";
+import { listByType, putMany } from "../db/content.js";
 import artworksData from "../data/artworks.js";
 
-dotenv.config();
+// Artworks need a stable string id for the table sort key; derive one from the
+// title when the data file doesn't provide it.
+const slugify = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
 
 const seedArtworks = async () => {
     try {
-        await mongoose.connect(process.env.MONGO_URI);
         console.log("🎨 Seeding Artworks...".yellow);
 
-        const allPhilosophers = await Philosopher.find();
+        const allPhilosophers = await listByType("philosopher");
 
-        for (const art of artworksData) {
-            const relatedIds = [];
+        const items = artworksData.map((art) => {
+            const relatedPhilosopherIds = [];
 
             if (art.philosopher) {
                 // Split by & or , and trim
                 const names = art.philosopher.split(/&|,/).map(s => s.trim());
 
                 for (const name of names) {
-                    const p = allPhilosophers.find(ph => ph.nameEn === name || (ph.name && ph.name.en === name));
+                    const p = allPhilosophers.find(ph => ph.name?.en === name);
                     if (p) {
-                        relatedIds.push(p._id);
+                        relatedPhilosopherIds.push(p.id); // relation by string business key
                     } else {
                         console.log(`⚠️ Philosopher not found for artwork ${art.title}: ${name}`.red);
                     }
                 }
             }
 
-            const update = {
+            return {
                 ...art,
-                relatedPhilosophers: relatedIds,
-                relatedPhilosopherIds: relatedIds.map(oid => {
-                    const p = allPhilosophers.find(ph => ph._id.toString() === oid.toString());
-                    return p ? p.id : null;
-                }).filter(Boolean)
+                entityType: "artwork",
+                id: art.id || slugify(art.title),
+                relatedPhilosopherIds,
             };
+        });
 
-            // Upsert by title since ID might be new
-            await Artwork.findOneAndUpdate({ title: art.title }, update, { upsert: true, new: true });
-        }
-
-        console.log("✅ Artworks seeded".green);
+        await putMany(items);
+        console.log(`✅ ${items.length} Artworks seeded`.green);
         process.exit(0);
     } catch (err) {
         console.error(err);

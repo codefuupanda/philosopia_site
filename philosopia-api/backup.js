@@ -1,31 +1,14 @@
-import mongoose from 'mongoose';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import dotenv from 'dotenv';
+import { ScanCommand } from '@aws-sdk/lib-dynamodb';
+import { ddb, TABLES } from './db/client.js';
 
-import Philosopher from './models/Philosopher.js';
-import School from './models/School.js';
-import Period from './models/Period.js';
-import Concept from './models/Concept.js';
-import Beef from './models/beef.js';
-import Artwork from './models/Artwork.js';
-import User from './models/User.js';
-
-dotenv.config();
+// Dumps every DynamoDB table to timestamped JSON files under backups/.
+// (For point-in-time recovery, enable PITR on the tables in the AWS console.)
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-const models = {
-    Philosopher,
-    School,
-    Period,
-    Concept,
-    Beef,
-    Artwork,
-    User
-};
 
 const backupDir = path.join(__dirname, 'backups', new Date().toISOString().replace(/[:.]/g, '-'));
 
@@ -33,19 +16,27 @@ if (!fs.existsSync(backupDir)) {
     fs.mkdirSync(backupDir, { recursive: true });
 }
 
+async function scanAll(TableName) {
+    const items = [];
+    let ExclusiveStartKey;
+    do {
+        const res = await ddb.send(new ScanCommand({ TableName, ExclusiveStartKey }));
+        items.push(...(res.Items || []));
+        ExclusiveStartKey = res.LastEvaluatedKey;
+    } while (ExclusiveStartKey);
+    return items;
+}
+
 const backup = async () => {
     try {
-        await mongoose.connect(process.env.MONGO_URI);
-        console.log('Connected to MongoDB...');
-
-        for (const [modelName, Model] of Object.entries(models)) {
-            console.log(`Backing up ${modelName}...`);
-            const data = await Model.find({});
+        for (const [name, TableName] of Object.entries(TABLES)) {
+            console.log(`Backing up ${TableName}...`);
+            const data = await scanAll(TableName);
             fs.writeFileSync(
-                path.join(backupDir, `${modelName}.json`),
+                path.join(backupDir, `${name}.json`),
                 JSON.stringify(data, null, 2)
             );
-            console.log(`Saved ${data.length} ${modelName} records.`);
+            console.log(`Saved ${data.length} ${name} records.`);
         }
 
         console.log(`Backup completed successfully to ${backupDir}`);

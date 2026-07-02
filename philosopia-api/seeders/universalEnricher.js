@@ -40,11 +40,11 @@ async function getWikidataRelationships(qid, wikiTitle) {
 
     // 2. Fetch Relations from Wikidata SPARQL
     const sparqlQuery = `
-        SELECT ?prop ?propLabelEn ?propLabelHe ?item ?itemLabelEn ?itemLabelHe WHERE {
-            VALUES ?prop { wd:P737 wd:P802 wd:P27 wd:P1343 wd:P140 }
+        SELECT ?prop ?item ?itemLabel ?itemLabelHe WHERE {
+            VALUES ?prop { wdt:P737 wdt:P802 wdt:P27 wdt:P1343 wdt:P140 }
             wd:${qid} ?prop ?item .
-            SERVICE wikibase:label { bd:serviceParam wikibase:language "en,he". ?prop rdfs:label ?propLabelEn. ?item rdfs:label ?itemLabelEn. }
-            SERVICE wikibase:label { bd:serviceParam wikibase:language "he". ?prop rdfs:label ?propLabelHe. ?item rdfs:label ?itemLabelHe. }
+            SERVICE wikibase:label { bd:serviceParam wikibase:language "en". ?item rdfs:label ?itemLabel. }
+            OPTIONAL { ?item rdfs:label ?itemLabelHe . FILTER(LANG(?itemLabelHe) = "he") }
         }
     `;
 
@@ -70,11 +70,11 @@ async function getWikidataRelationships(qid, wikiTitle) {
         const results = response.data.results.bindings;
 
         const propertyMap = {
-            'http://www.wikidata.org/entity/P737': 'influencedBy',
-            'http://www.wikidata.org/entity/P802': 'students',
-            'http://www.wikidata.org/entity/P27': 'countryOfCitizenship',
-            'http://www.wikidata.org/entity/P1343': 'foundationalTexts',
-            'http://www.wikidata.org/entity/P140': 'religion',
+            'http://www.wikidata.org/prop/direct/P737': 'influencedBy',
+            'http://www.wikidata.org/prop/direct/P802': 'students',
+            'http://www.wikidata.org/prop/direct/P27': 'countryOfCitizenship',
+            'http://www.wikidata.org/prop/direct/P1343': 'foundationalTexts',
+            'http://www.wikidata.org/prop/direct/P140': 'religion',
         };
 
         results.forEach(binding => {
@@ -86,8 +86,8 @@ async function getWikidataRelationships(qid, wikiTitle) {
                     const itemQid = binding.item.value.split('/').pop();
                     const itemData = {
                         qid: itemQid,
-                        labelEn: binding.itemLabelEn?.value,
-                        labelHe: binding.itemLabelHe?.value || binding.itemLabelEn?.value,
+                        labelEn: binding.itemLabel?.value,
+                        labelHe: binding.itemLabelHe?.value || binding.itemLabel?.value,
                     };
 
                     const exists = structuredRelations[fieldName].some(i => i.qid === itemQid);
