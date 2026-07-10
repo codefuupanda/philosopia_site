@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { useLocation, Link } from 'react-router-dom';
-import { api } from '../lib/api';
+import React, { useState, useMemo, useCallback } from 'react';
+import { useLocation, Link, useSearchParams } from 'react-router-dom';
+import { useQuotes } from '../hooks/queries';
 import { texts } from '../i18n/texts';
 import { cn } from '../lib/utils';
 import { Copy, Check, Flame } from 'lucide-react';
@@ -81,26 +81,11 @@ export default function QuotesPage() {
     const t = texts[lang];
     const isRtl = lang === 'he';
 
-    const [allQuotes, setAllQuotes] = useState([]);
-    const [loading, setLoading] = useState(true);
+    // Fetch all quotes once (cached by React Query). Filter client-side — no
+    // need to re-fetch for tags.
+    const { data: allQuotes = [], isLoading: loading } = useQuotes(lang);
     const [copiedId, setCopiedId] = useState(null);
-    const [selectedTag, setSelectedTag] = useState(null);
-
-    // Fetch all quotes once. Filter client-side — no need to re-fetch for tags.
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                setLoading(true);
-                const data = await api.getQuotes(lang);
-                setAllQuotes(data);
-            } catch (err) {
-                console.error(err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
-    }, [lang]);
+    const [searchParams, setSearchParams] = useSearchParams();
 
     // Derive available tags from full dataset
     const availableTags = useMemo(() => {
@@ -115,6 +100,18 @@ export default function QuotesPage() {
             .sort((a, b) => b[1] - a[1])
             .map(([tag]) => tag);
     }, [allQuotes]);
+
+    // The active tag lives in the URL (?tag=ethics) so the homepage Stoa chips
+    // deep-link here. Matched case-insensitively against the stored tags.
+    const tagParam = searchParams.get('tag');
+    const selectedTag = useMemo(() => {
+        if (!tagParam) return null;
+        return availableTags.find((t) => t.toLowerCase() === tagParam.toLowerCase()) || null;
+    }, [tagParam, availableTags]);
+
+    const setSelectedTag = useCallback((tag) => {
+        setSearchParams(tag ? { tag: tag.toLowerCase() } : {}, { replace: true });
+    }, [setSearchParams]);
 
     // Client-side filter
     const filtered = useMemo(() => {

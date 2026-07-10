@@ -1,83 +1,57 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useLanguage } from '../i18n/LanguageContext';
-import { api } from '../lib/api';
-import { getCache, setCache } from '../lib/cache';
+import { useArtworks } from '../hooks/queries';
 import { Loader } from '../components/ui/Loader';
 
-const ARTWORKS_CACHE_KEY = 'artworks:enhanced';
+const fetchWikiImage = async (filename, width = 800) => {
+    const endpoint = "https://commons.wikimedia.org/w/api.php";
+    const params = new URLSearchParams({
+        action: "query",
+        prop: "imageinfo",
+        iiprop: "url|extmetadata",
+        iiurlwidth: width,
+        titles: `File:${filename}`,
+        format: "json",
+        origin: "*"
+    });
+
+    const response = await fetch(`${endpoint}?${params.toString()}`);
+    if (!response.ok) throw new Error("API Error");
+
+    const data = await response.json();
+    const pages = data.query.pages;
+    const pageId = Object.keys(pages)[0];
+
+    if (pageId === "-1") return null;
+
+    const imageInfo = pages[pageId].imageinfo[0];
+    return {
+        imageUrl: imageInfo.thumburl,
+        originalUrl: imageInfo.url,
+        license: imageInfo.extmetadata.LicenseShortName.value,
+    };
+};
+
+// Enhance raw artworks with MediaWiki image data — runs inside the cached
+// queryFn, so the external lookups happen once per cache window, not per mount.
+const enhanceWithWikiImages = (data) =>
+    Promise.all(data.map(async (work) => {
+        if (work.status === 'copyrighted') return work;
+
+        try {
+            const wikiData = await fetchWikiImage(work.filename);
+            return { ...work, ...wikiData };
+        } catch (error) {
+            console.error(`Failed to fetch image for ${work.title}`, error);
+            return work;
+        }
+    }));
 
 const ArtAndPhiloPage = () => {
-    const [artworks, setArtworks] = useState([]);
-    const [loading, setLoading] = useState(true);
     const { language } = useLanguage();
     const isHebrew = language === 'he';
 
-    useEffect(() => {
-        const fetchArtworks = async () => {
-            try {
-                // Check for cached enhanced data first
-                const cached = getCache(ARTWORKS_CACHE_KEY);
-                if (cached && cached.data) {
-                    setArtworks(cached.data);
-                    setLoading(false);
-                    if (!cached.isStale) return;
-                }
-
-                const data = await api.getArtworks();
-
-                // Enhance data with MediaWiki images
-                const enhancedData = await Promise.all(data.map(async (work) => {
-                    if (work.status === 'copyrighted') return work;
-
-                    try {
-                        const wikiData = await fetchWikiImage(work.filename);
-                        return { ...work, ...wikiData };
-                    } catch (error) {
-                        console.error(`Failed to fetch image for ${work.title}`, error);
-                        return work;
-                    }
-                }));
-
-                setCache(ARTWORKS_CACHE_KEY, enhancedData, 10 * 60 * 1000);
-                setArtworks(enhancedData);
-            } catch (error) {
-                console.error('Error fetching artworks:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchArtworks();
-    }, []);
-
-    const fetchWikiImage = async (filename, width = 800) => {
-        const endpoint = "https://commons.wikimedia.org/w/api.php";
-        const params = new URLSearchParams({
-            action: "query",
-            prop: "imageinfo",
-            iiprop: "url|extmetadata",
-            iiurlwidth: width,
-            titles: `File:${filename}`,
-            format: "json",
-            origin: "*"
-        });
-
-        const response = await fetch(`${endpoint}?${params.toString()}`);
-        if (!response.ok) throw new Error("API Error");
-
-        const data = await response.json();
-        const pages = data.query.pages;
-        const pageId = Object.keys(pages)[0];
-
-        if (pageId === "-1") return null;
-
-        const imageInfo = pages[pageId].imageinfo[0];
-        return {
-            imageUrl: imageInfo.thumburl,
-            originalUrl: imageInfo.url,
-            license: imageInfo.extmetadata.LicenseShortName.value,
-        };
-    };
+    const { data: artworks = [], isLoading: loading } = useArtworks(enhanceWithWikiImages);
 
     if (loading) return <div className="p-20 flex justify-center"><Loader /></div>;
 

@@ -1,58 +1,50 @@
 import axios from 'axios';
-import { fetchWithCache } from './cache';
 
-export const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
-/**
- * Generic cached GET request
- * @param {string} endpoint - API endpoint (e.g., '/philosophers')
- * @param {object} params - Query parameters
- * @param {number} ttl - Cache TTL in ms (default 5 min)
- */
-export async function cachedGet(endpoint, params = {}, ttl = 5 * 60 * 1000) {
-    const queryString = new URLSearchParams(params).toString();
-    const url = queryString ? `${endpoint}?${queryString}` : endpoint;
-    const cacheKey = `api:${url}`;
+const client = axios.create({ baseURL: API_BASE_URL });
 
-    const { data } = await fetchWithCache(
-        cacheKey,
-        async () => {
-            const response = await axios.get(`${API_BASE_URL}${endpoint}`, { params });
-            return response.data;
-        },
-        ttl
-    );
+// Plain fetchers returning response.data — caching, dedup, and retries are
+// React Query's job now (see src/hooks/queries.js), not this layer's.
+const get = async (endpoint, params) => (await client.get(endpoint, { params })).data;
 
-    return data;
-}
+const authHeaders = (token) => ({ headers: { Authorization: `Bearer ${token}` } });
 
 export const api = {
     // Philosophers
-    getPhilosophers: (params = {}) => cachedGet('/philosophers', params),
-    getPhilosopher: (id) => cachedGet(`/philosophers/${id}`),
+    getPhilosophers: (params = {}) => get('/philosophers', params),
+    getPhilosopher: (id) => get(`/philosophers/${id}`),
+    getGraphNetwork: () => get('/philosophers/graph/network'),
 
     // Periods
-    getPeriods: () => cachedGet('/periods'),
-    getPeriod: (id) => cachedGet(`/periods/${id}`),
+    getPeriods: () => get('/periods'),
+    getPeriod: (id) => get(`/periods/${id}`),
 
     // Schools
-    getSchools: () => cachedGet('/schools'),
-    getSchool: (id) => cachedGet(`/schools/${id}`),
+    getSchools: () => get('/schools'),
+    getSchool: (id) => get(`/schools/${id}`),
 
     // Concepts
-    getConcepts: () => cachedGet('/concepts'),
-    getConcept: (id) => cachedGet(`/concepts/${id}`),
+    getConcepts: () => get('/concepts'),
+    getConcept: (id) => get(`/concepts/${id}`),
 
     // Beefs
-    getBeefs: () => cachedGet('/beefs'),
-    getBeef: (id) => cachedGet(`/beefs/${id}`),
+    getBeefs: () => get('/beefs'),
+    getBeef: (id) => get(`/beefs/${id}`),
 
     // Works
-    getWorks: (lang) => cachedGet('/works', { lang }),
+    getWorks: (lang) => get('/works', { lang }),
 
     // Quotes
-    getQuotes: (lang, filters = {}) => cachedGet('/quotes', { lang, ...filters }),
+    getQuotes: (lang, filters = {}) => get('/quotes', { lang, ...filters }),
 
     // Artworks
-    getArtworks: () => cachedGet('/artworks')
+    getArtworks: () => get('/artworks'),
+
+    // Analytics (admin dashboard)
+    getAnalyticsStats: (days) => get('/analytics/stats', { days }),
+
+    // Admin mutations (JWT)
+    createBeef: (payload, token) => client.post('/beefs', payload, authHeaders(token)).then((r) => r.data),
+    deleteBeef: (id, token) => client.delete(`/beefs/${id}`, authHeaders(token)).then((r) => r.data),
 };

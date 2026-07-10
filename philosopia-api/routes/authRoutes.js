@@ -7,8 +7,10 @@ import { authLimiter } from '../middleware/rateLimiter.js';
 const router = express.Router();
 
 // Token subject is the username (the users table PK — no ObjectIds in DynamoDB).
+// No fallback secret: with JWT_SECRET unset, signing throws (login 500s) rather
+// than issuing tokens anyone can forge with a known value.
 const generateToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET || 'secret', {
+    return jwt.sign({ id }, process.env.JWT_SECRET, {
         expiresIn: '30d',
     });
 };

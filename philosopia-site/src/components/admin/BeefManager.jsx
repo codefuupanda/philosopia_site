@@ -1,15 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useAuth } from '../../context/AuthContext';
+import React, { useState } from 'react';
 import { Trash2, Plus } from 'lucide-react';
+import { api } from '../../lib/api';
+import { useBeefs, useCreateBeef, useDeleteBeef } from '../../hooks/queries';
 import { Loader } from '../ui/Loader';
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
-
 function BeefManager() {
-    const { user } = useAuth();
-    const [beefs, setBeefs] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const { data, isLoading: loading } = useBeefs();
+    const beefs = data?.beefs ?? [];
+
+    // Mutations invalidate the ['beefs'] query on success, so the list
+    // (here and on the public Beefs page) refreshes without a manual refetch.
+    const createBeef = useCreateBeef();
+    const deleteBeef = useDeleteBeef();
+
     const [formData, setFormData] = useState({
         id: '',
         titleEn: '',
@@ -20,56 +23,30 @@ function BeefManager() {
         philosopherB: ''
     });
 
-    useEffect(() => {
-        fetchBeefs();
-    }, []);
-
-    const fetchBeefs = async () => {
-        try {
-            const { data } = await axios.get(`${API_BASE_URL}/beefs`);
-            setBeefs(data.beefs);
-            setLoading(false);
-        } catch (error) {
-            console.error("Error fetching beefs:", error);
-            setLoading(false);
-        }
-    };
-
-    const handleDelete = async (id) => {
+    const handleDelete = (id) => {
         if (!window.confirm('Are you sure you want to delete this beef?')) return;
-        try {
-            const config = {
-                headers: { Authorization: `Bearer ${user?.token}` },
-            };
-            await axios.delete(`${API_BASE_URL}/beefs/${id}`, config);
-            fetchBeefs();
-        } catch (error) {
-            alert('Error deleting beef');
-        }
+        deleteBeef.mutate(id, {
+            onError: () => alert('Error deleting beef'),
+        });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const philA = await axios.get(`${API_BASE_URL}/philosophers/${formData.philosopherA}`);
-            const philB = await axios.get(`${API_BASE_URL}/philosophers/${formData.philosopherB}`);
+            // Validate both philosopher ids exist (throws 404 on a bad id).
+            // The beefs route joins by string ids, so the form ids go through as-is.
+            await api.getPhilosopher(formData.philosopherA);
+            await api.getPhilosopher(formData.philosopherB);
 
-            const payload = {
-                ...formData,
-                philosopherA: philA.data._id,
-                philosopherB: philB.data._id
-            };
-
-            const config = {
-                headers: { Authorization: `Bearer ${user?.token}` },
-            };
-
-            await axios.post(`${API_BASE_URL}/beefs`, payload, config);
-            setFormData({
-                id: '', titleEn: '', titleHe: '', descriptionEn: '', descriptionHe: '', philosopherA: '', philosopherB: ''
+            createBeef.mutate(formData, {
+                onSuccess: () => {
+                    setFormData({
+                        id: '', titleEn: '', titleHe: '', descriptionEn: '', descriptionHe: '', philosopherA: '', philosopherB: ''
+                    });
+                    alert('Beef added successfully!');
+                },
+                onError: () => alert('Error adding beef. Ensure Philosopher IDs are correct.'),
             });
-            fetchBeefs();
-            alert('Beef added successfully!');
         } catch (error) {
             console.error(error);
             alert('Error adding beef. Ensure Philosopher IDs are correct.');

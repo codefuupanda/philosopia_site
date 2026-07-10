@@ -1,48 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 import {
   Users, BookOpen, Scale, Lightbulb, TrendingUp, Eye,
   Clock, MousePointerClick, LogOut as LogOutIcon, BarChart3, Activity
 } from 'lucide-react';
+import { useAdminStats } from '../../hooks/queries';
 import { Loader } from '../ui/Loader';
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
-
 function Statistics() {
-  const [contentStats, setContentStats] = useState(null);
-  const [analytics, setAnalytics] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [days, setDays] = useState(7);
 
-  useEffect(() => {
-    fetchAll();
-  }, [days]);
-
-  const fetchAll = async () => {
-    setLoading(true);
-    try {
-      const [philosophers, schools, concepts, beefs, analyticsRes] = await Promise.all([
-        axios.get(`${API_BASE_URL}/philosophers?limit=999`),
-        axios.get(`${API_BASE_URL}/schools`),
-        axios.get(`${API_BASE_URL}/concepts`),
-        axios.get(`${API_BASE_URL}/beefs`),
-        axios.get(`${API_BASE_URL}/analytics/stats?days=${days}`).catch(() => ({ data: null })),
-      ]);
-
-      setContentStats({
-        philosophers: philosophers.data.philosophers?.length || philosophers.data.length || 0,
-        schools: schools.data.schools?.length || schools.data.length || 0,
-        concepts: concepts.data.concepts?.length || concepts.data.length || 0,
-        beefs: beefs.data.beefs?.length || beefs.data.length || 0,
-      });
-
-      setAnalytics(analyticsRes.data);
-    } catch (error) {
-      console.error('Error fetching stats:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data, isLoading: loading } = useAdminStats(days);
+  const contentStats = data?.contentStats;
+  const analytics = data?.analytics;
 
   if (loading) {
     return <div className="py-20 flex justify-center"><Loader /></div>;

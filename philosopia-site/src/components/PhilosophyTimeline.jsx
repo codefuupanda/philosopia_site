@@ -12,7 +12,7 @@ import { Separator } from "./ui/separator";
 // Icons (Lucide)
 import { Scroll, Quote, BookOpen, ArrowRight, Loader2 } from 'lucide-react';
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
 export default function PhilosophyTimeline() {
   const { language } = useLanguage();

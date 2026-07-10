@@ -18,8 +18,8 @@ COPY --from=deps /app/node_modules ./node_modules
 # Copy source code
 COPY . .
 
-# Tell React to call /api on the same origin (Nginx will proxy it)
-ENV REACT_APP_API_BASE_URL=/api
+# Tell the app to call /api on the same origin (Nginx will proxy it)
+ENV VITE_API_BASE_URL=/api
 
 RUN npm run build
 
@@ -29,8 +29,8 @@ FROM nginx:alpine
 # Remove default Nginx static files
 RUN rm -rf /usr/share/nginx/html/*
 
-# Copy our built React app from stage 2
-COPY --from=build /app/build /usr/share/nginx/html
+# Copy our built React app from stage 2 (Vite outputs to dist/, not CRA's build/)
+COPY --from=build /app/dist /usr/share/nginx/html
 
 # Copy custom Nginx config
 COPY nginx.conf /etc/nginx/conf.d/default.conf

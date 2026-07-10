@@ -9,7 +9,9 @@ export const protect = (req, res, next) => {
     ) {
         try {
             token = req.headers.authorization.split(' ')[1];
-            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
+            // No fallback secret: if JWT_SECRET is unset, verification fails
+            // closed (401) rather than accepting tokens forged with a known value.
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
             req.user = decoded;
             next();
         } catch (error) {

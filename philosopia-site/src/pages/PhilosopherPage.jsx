@@ -1,13 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import axios from 'axios';
 import { useLanguage } from '../i18n/LanguageContext';
+import { usePhilosopher } from '../hooks/queries';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
 import { Loader } from '../components/ui/Loader';
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL //|| 'http://localhost:5000/api';
-
 // --- Helper: Wikidata List ---
+// Relations resolved to one of our own philosophers arrive with a
+// `philosopherId` slug (see api db/philosopherGraph.js) and render as links;
+// everything else stays an inert chip. `inferred: true` marks reverse edges
+// the API synthesized (X lists me as influence → X is my follower), shown
+// with a dashed border to hint they're derived rather than stated.
 const WikidataList = ({ label, items, lang }) => {
   if (!items || items.length === 0) return null;
   const isHebrew = lang === 'he';
@@ -18,15 +21,30 @@ const WikidataList = ({ label, items, lang }) => {
         {label}
       </span>
       <div className="flex flex-wrap gap-2">
-        {items.map((item, idx) => (
-          <span
-            key={idx}
-            className="text-sm text-foreground/80 bg-muted/50 px-2 py-1 rounded border border-border/50"
-            title={item.qid}
-          >
-            {isHebrew ? (item.labelHe || item.labelEn) : item.labelEn}
-          </span>
-        ))}
+        {items.map((item, idx) => {
+          const text = isHebrew ? (item.labelHe || item.labelEn) : item.labelEn;
+          if (item.philosopherId) {
+            return (
+              <Link
+                key={item.qid || idx}
+                to={`/${lang}/philosophers/${item.philosopherId}`}
+                title={item.qid}
+                className={`text-sm text-primary bg-primary/10 hover:bg-primary/20 px-2 py-1 rounded border transition-colors font-medium ${item.inferred ? 'border-dashed border-primary/40' : 'border-primary/30'}`}
+              >
+                {text}
+              </Link>
+            );
+          }
+          return (
+            <span
+              key={item.qid || idx}
+              className="text-sm text-foreground/80 bg-muted/50 px-2 py-1 rounded border border-border/50"
+              title={item.qid}
+            >
+              {text}
+            </span>
+          );
+        })}
       </div>
     </div>
   );
@@ -37,33 +55,23 @@ export default function PhilosopherPage() {
   const { language } = useLanguage();
   const isHebrew = language === 'he';
 
-  const [philosopher, setPhilosopher] = useState(null);
-  const [linkedConcepts, setLinkedConcepts] = useState([]); // ✅ New State
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const res = await axios.get(`${API_BASE_URL}/philosophers/${id}`);
-        setPhilosopher(res.data.philosopher);
-        setLinkedConcepts(res.data.linkedConcepts || []); // ✅ Save Concepts
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, [id]);
+  const { data, isLoading: loading, isError } = usePhilosopher(id);
+  const philosopher = data?.philosopher;
+  const linkedConcepts = data?.linkedConcepts ?? [];
 
   if (loading) return <div className="p-20 flex justify-center"><Loader /></div>;
-  if (!philosopher) return <div className="p-20 text-center text-destructive text-xl">Philosopher Not Found</div>;
+  if (isError || !philosopher) return <div className="p-20 text-center text-destructive text-xl">Philosopher Not Found</div>;
 
   const name = isHebrew ? philosopher.nameHe : philosopher.nameEn;
   const years = isHebrew ? philosopher.yearsHe : philosopher.yearsEn;
   const oneLiner = isHebrew ? philosopher.summaryHe : philosopher.summaryEn;
-  const fullBio = isHebrew ? (philosopher.wikiData?.bioHe || philosopher.bioHtml) : philosopher.bioHtml;
+  // Rich Wikipedia bio (HTML) in the active language. A philosopher whose
+  // Wikidata item has no Hebrew Wikipedia article (or a fresh not-yet-enriched
+  // record) lacks it, so we fall back to the short plain-text summary in the
+  // SAME language. We never fall back to the other language: an English
+  // paragraph inside the RTL Hebrew layout reads as broken.
+  const richBio = isHebrew ? philosopher.wikiData?.bioHe : philosopher.bioHtml;
+  const summary = isHebrew ? philosopher.summaryHe : philosopher.summaryEn;
   const imageUrl = philosopher.imageUrl;
   const wikiLink = `https://en.wikipedia.org/wiki/${philosopher.wikiTitle}`;
   const bioHeader = isHebrew ? `על ${name}` : `About ${name}`;
@@ -176,11 +184,16 @@ export default function PhilosopherPage() {
               {bioHeader}
             </h2>
 
-            {fullBio ? (
+            {richBio ? (
               <div
                 className="prose prose-lg dark:prose-invert max-w-none text-foreground/90 leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: fullBio }}
+                dangerouslySetInnerHTML={{ __html: richBio }}
               />
+            ) : summary ? (
+              // Fallback: render the plain-text summary as escaped text, not HTML.
+              <div className="prose prose-lg dark:prose-invert max-w-none text-foreground/90 leading-relaxed">
+                <p>{summary}</p>
+              </div>
             ) : (
               <p className="text-muted-foreground italic">
                 {isHebrew ? "מידע נוסף אינו זמין כרגע." : "Additional information is not available at the moment."}

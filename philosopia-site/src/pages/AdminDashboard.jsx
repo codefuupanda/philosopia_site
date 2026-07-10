@@ -15,13 +15,15 @@ function AdminDashboard() {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('statistics');
 
+    // Auth guard: unauthenticated visitors are sent to the login page,
+    // and nothing admin-shaped is rendered in the meantime.
     useEffect(() => {
-        // TODO: re-enable auth guard
-        // if (!user) {
-        //     navigate('/login');
-        //     return;
-        // }
+        if (!user) {
+            navigate('/login');
+        }
     }, [user, navigate]);
+
+    if (!user) return null;
 
     return (
         <div className="min-h-screen bg-background text-foreground p-8">

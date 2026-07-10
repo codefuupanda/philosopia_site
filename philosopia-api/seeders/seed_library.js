@@ -35,7 +35,7 @@ const libraryData = [
         }
     },
     {
-        philosopherId: "descartes",
+        philosopherId: "rene_descartes",
         work: {
             id: "meditations",
             title: { en: "Meditations on First Philosophy", he: "הגיונות על הפילוסופיה הראשונית" },
@@ -49,7 +49,7 @@ const libraryData = [
     },
     // Nietzsche
     {
-        philosopherId: "nietzsche",
+        philosopherId: "friedrich_nietzsche",
         work: {
             id: "thus_spoke_zarathustra",
             title: { en: "Thus Spoke Zarathustra", he: "כה אמר זרתוסטרא" },
@@ -62,7 +62,7 @@ const libraryData = [
         }
     },
     {
-        philosopherId: "nietzsche",
+        philosopherId: "friedrich_nietzsche",
         work: {
             id: "beyond_good_and_evil",
             title: { en: "Beyond Good and Evil", he: "מעבר לטוב ולרוע" },
@@ -76,7 +76,7 @@ const libraryData = [
     },
     // Kant
     {
-        philosopherId: "kant",
+        philosopherId: "immanuel_kant",
         work: {
             id: "critique_pure_reason",
             title: { en: "Critique of Pure Reason", he: "ביקורת התבונה הטהורה" },
@@ -89,7 +89,7 @@ const libraryData = [
         }
     },
     {
-        philosopherId: "kant",
+        philosopherId: "immanuel_kant",
         work: {
             id: "groundwork_metaphysics",
             title: { en: "Groundwork of the Metaphysic of Morals", he: "הנחת יסוד למטפיזיקה של המידות" },
@@ -130,7 +130,7 @@ const libraryData = [
     },
     // Spinoza
     {
-        philosopherId: "spinoza",
+        philosopherId: "baruch_spinoza",
         work: {
             id: "ethics_spinoza",
             title: { en: "Ethics", he: "אתיקה" },
@@ -143,7 +143,7 @@ const libraryData = [
         }
     },
     {
-        philosopherId: "spinoza",
+        philosopherId: "baruch_spinoza",
         work: {
             id: "theologico_political",
             title: { en: "Theologico-Political Treatise", he: "מאמר תיאולוגי-מדיני" },
@@ -157,7 +157,7 @@ const libraryData = [
     },
     // Simone de Beauvoir
     {
-        philosopherId: "de_beauvoir",
+        philosopherId: "simone_de_beauvoir",
         work: {
             id: "second_sex",
             title: { en: "The Second Sex", he: "המין השני" },
@@ -170,7 +170,7 @@ const libraryData = [
         }
     },
     {
-        philosopherId: "de_beauvoir",
+        philosopherId: "simone_de_beauvoir",
         work: {
             id: "ethics_of_ambiguity",
             title: { en: "The Ethics of Ambiguity", he: "האתיקה של העמימות" },

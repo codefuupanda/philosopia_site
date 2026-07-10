@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useLanguage } from "../i18n/LanguageContext";
-import { api } from "../lib/api";
+import { usePhilosophersList, usePeriods } from "../hooks/queries";
 import { texts } from "../i18n/texts";
 import { Brain, ChevronLeft, ChevronRight, LayoutGrid, Clock } from 'lucide-react';
 import { Loader } from '../components/ui/Loader';
@@ -20,75 +20,64 @@ const PAGE_SIZE = 12;
 
 // ─── Grid View ───────────────────────────────────────────────────────────────
 
+const dedup = (list) => {
+  const unique = [];
+  const seen = new Set();
+  for (const p of list) {
+    if (!seen.has(p.id || p._id)) {
+      seen.add(p.id || p._id);
+      unique.push(p);
+    }
+  }
+  return unique;
+};
+
 function GridView({ lang, isHebrew, t, searchParams, setSearchParams }) {
-  const [philosophers, setPhilosophers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [totalPages, setTotalPages] = useState(1);
   const [activeLetter, setActiveLetter] = useState(null);
-  const [availableLetters, setAvailableLetters] = useState(null); // null = still loading
 
   const page = Math.max(1, parseInt(searchParams.get("page")) || 1);
 
-  // One-time fetch on mount to know which letters have at least one philosopher
-  useEffect(() => {
-    api.getPhilosophers({ page: 1, limit: 500 }).then((data) => {
-      const nameKey = isHebrew ? "nameHe" : "nameEn";
-      const set = new Set(
-        (data.philosophers || [])
-          .map((p) => (p[nameKey] || "").charAt(0).toUpperCase())
-          .filter(Boolean)
-      );
-      setAvailableLetters(set);
-    }).catch(() => {
-      setAvailableLetters(new Set()); // fail open — disable all if fetch fails
+  // Full list — powers the letter-availability index and letter-filtered view.
+  // React Query dedupes this against the letter-filtered query below (same key).
+  const fullListQuery = usePhilosophersList({ page: 1, limit: 500 });
+
+  // The list actually shown: full list while a letter filter is active,
+  // the normal paginated fetch otherwise.
+  const listQuery = usePhilosophersList(
+    activeLetter ? { page: 1, limit: 500 } : { page, limit: PAGE_SIZE }
+  );
+
+  // Which letters have at least one philosopher (null = still loading)
+  const availableLetters = useMemo(() => {
+    if (fullListQuery.isLoading) return null;
+    if (fullListQuery.isError) return new Set(); // fail open — disable all
+    const nameKey = isHebrew ? "nameHe" : "nameEn";
+    return new Set(
+      (fullListQuery.data?.philosophers || [])
+        .map((p) => (p[nameKey] || "").charAt(0).toUpperCase())
+        .filter(Boolean)
+    );
+  }, [fullListQuery.isLoading, fullListQuery.isError, fullListQuery.data, isHebrew]);
+
+  const loading = listQuery.isLoading;
+  const error = listQuery.isError
+    ? (isHebrew ? "שגיאה בטעינת רשימת הפילוסופים." : "Error loading philosophers list.")
+    : null;
+
+  const philosophers = useMemo(() => {
+    const all = dedup(listQuery.data?.philosophers || []);
+    if (!activeLetter) return all;
+    return all.filter((p) => {
+      const name = isHebrew ? (p.nameHe || "") : (p.nameEn || "");
+      return name.charAt(0).toUpperCase() === activeLetter;
     });
-  }, [isHebrew]);
+  }, [listQuery.data, activeLetter, isHebrew]);
+
+  const totalPages = activeLetter ? 1 : (listQuery.data?.totalPages || 1);
 
   useEffect(() => {
-    const loadPhilosophers = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const dedup = (list) => {
-          const unique = [];
-          const seen = new Set();
-          for (const p of list) {
-            if (!seen.has(p.id || p._id)) {
-              seen.add(p.id || p._id);
-              unique.push(p);
-            }
-          }
-          return unique;
-        };
-
-        if (activeLetter) {
-          // Fetch all to filter client-side; pagination is suppressed while a letter is active
-          const data = await api.getPhilosophers({ page: 1, limit: 500 });
-          const all = dedup(data.philosophers || []);
-          const filtered = all.filter((p) => {
-            const name = isHebrew ? (p.nameHe || "") : (p.nameEn || "");
-            return name.charAt(0).toUpperCase() === activeLetter;
-          });
-          setPhilosophers(filtered);
-          setTotalPages(1);
-        } else {
-          // Normal paginated fetch — existing behaviour untouched
-          const data = await api.getPhilosophers({ page, limit: PAGE_SIZE });
-          setPhilosophers(dedup(data.philosophers || []));
-          setTotalPages(data.totalPages || 1);
-        }
-      } catch (err) {
-        console.error("Error loading philosophers:", err);
-        setError(isHebrew ? "שגיאה בטעינת רשימת הפילוסופים." : "Error loading philosophers list.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadPhilosophers();
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [page, isHebrew, activeLetter]);
+  }, [page, activeLetter]);
 
   const handleLetterSelect = useCallback((letter) => {
     setActiveLetter(letter);
@@ -271,9 +260,23 @@ function GridView({ lang, isHebrew, t, searchParams, setSearchParams }) {
 
 // ─── Timeline View ───────────────────────────────────────────────────────────
 
+const ALLOWED_PERIODS = [
+  "pre_socratic",
+  "classical_period",
+  "hellenistic_period",
+  "medieval_period",
+  "early_modern_period",
+  "modern_period",
+  "contemporary_period"
+];
+
+const formatYear = (y) => {
+  if (!y) return "";
+  return y < 0 ? `${Math.abs(y)} BCE` : `${y} CE`;
+};
+
 function TimelineView({ lang, isHebrew }) {
-  const [eras, setEras] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data: periodsData, isLoading: loading } = usePeriods();
 
   const [activeEraIndex, setActiveEraIndex] = useState(0);
   const [activePhilosopherId, setActivePhilosopherId] = useState(null);
@@ -281,58 +284,32 @@ function TimelineView({ lang, isHebrew }) {
   const [activeFilter] = useState("All");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // Fetch Data
-  useEffect(() => {
-    const fetchTimeline = async () => {
-      try {
-        const periodsData = await api.getPeriods();
-        const allPeriods = periodsData.periods || [];
+  const eras = useMemo(() => {
+    const allPeriods = periodsData?.periods || [];
 
-        const allowedPeriods = [
-          "pre_socratic",
-          "classical_greek",
-          "hellenistic_period",
-          "medieval_period",
-          "early_modern_period",
-          "modern_period",
-          "contemporary_period"
-        ];
+    const filteredEras = allPeriods
+      .filter(p => ALLOWED_PERIODS.includes(p.id))
+      .map(p => {
+        let nameEn = p.nameEn;
+        let nameHe = p.nameHe;
 
-        const formatYear = (y) => {
-          if (!y) return "";
-          return y < 0 ? `${Math.abs(y)} BCE` : `${y} CE`;
-        };
+        if (p.id === 'contemporary_period') {
+          nameEn = "20th Century";
+          nameHe = "המאה ה-20";
+        }
+        if (p.id === 'modern_period') {
+          nameEn = "Modern (19th C.)";
+          nameHe = "העת החדשה (המאה ה-19)";
+        }
 
-        const filteredEras = allPeriods
-          .filter(p => allowedPeriods.includes(p.id))
-          .map(p => {
-            let nameEn = p.nameEn;
-            let nameHe = p.nameHe;
+        const dates = `${formatYear(p.startYear)} - ${formatYear(p.endYear)}`;
 
-            if (p.id === 'contemporary_period') {
-              nameEn = "20th Century";
-              nameHe = "המאה ה-20";
-            }
-            if (p.id === 'modern_period') {
-              nameEn = "Modern (19th C.)";
-              nameHe = "העת החדשה (המאה ה-19)";
-            }
+        return { ...p, nameEn, nameHe, dates };
+      });
 
-            const dates = `${formatYear(p.startYear)} - ${formatYear(p.endYear)}`;
-
-            return { ...p, nameEn, nameHe, dates };
-          });
-
-        filteredEras.sort((a, b) => a.startYear - b.startYear);
-        setEras(filteredEras);
-      } catch (err) {
-        console.error("Failed to fetch timeline:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchTimeline();
-  }, []);
+    filteredEras.sort((a, b) => a.startYear - b.startYear);
+    return filteredEras;
+  }, [periodsData]);
 
   // Scroll Spy Logic
   useEffect(() => {

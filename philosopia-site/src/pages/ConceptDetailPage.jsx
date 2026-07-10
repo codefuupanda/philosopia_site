@@ -1,35 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useParams, Link } from "react-router-dom";
-import axios from "axios";
 import { useLanguage } from "../i18n/LanguageContext";
+import { useConcept } from "../hooks/queries";
 import { Loader } from '../components/ui/Loader';
-
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL //|| 'http://localhost:5000/api';
 
 export default function ConceptDetailPage() {
   const { id } = useParams();
   const { language } = useLanguage();
   const isHebrew = language === "he";
 
-  const [concept, setConcept] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchConcept() {
-      try {
-        const res = await axios.get(`${API_BASE_URL}/concepts/${id}`);
-        setConcept(res.data.concept);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchConcept();
-  }, [id]);
+  const { data, isLoading: loading, isError } = useConcept(id);
+  const concept = data?.concept;
 
   if (loading) return <div className="p-20 flex justify-center"><Loader /></div>;
-  if (!concept) return <div className="p-20 text-center">Concept Not Found</div>;
+  if (isError || !concept) return <div className="p-20 text-center">Concept Not Found</div>;
 
   const name = isHebrew ? concept.nameHe : concept.nameEn;
   const summary = isHebrew ? concept.summaryHe : concept.summaryEn;

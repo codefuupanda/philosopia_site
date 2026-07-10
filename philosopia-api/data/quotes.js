@@ -75,42 +75,42 @@ export default [
         quotesHe: ["העולם הוא ספר, ומי שאינו מטייל קורא רק דף אחד.", "בראת אותנו לעצמך, אלוהים, ולבנו חסר מנוח עד שימצא את מנוחתו בך."]
     },
     {
-        philosopherId: "aquinas",
+        philosopherId: "thomas_aquinas",
         quotesEn: ["To one who has faith, no explanation is necessary. To one without faith, no explanation is possible.", "Beware the man of a single book."],
         quotesHe: ["למי שיש אמונה, אין צורך בהסבר. למי שאין אמונה, שום הסבר אינו אפשרי.", "היזהרו מהאיש של ספר אחד."]
     },
     {
-        philosopherId: "maimonides",
+        philosopherId: "moses_maimonides",
         quotesEn: ["Give a man a fish and you feed him for a day; teach a man to fish and you feed him for a lifetime.", "The risk of a wrong decision is preferable to the terror of indecision."],
         quotesHe: ["תן לאדם דג והשבעת אותו ליום אחד; למד את האדם לדוג והשבעת אותו לכל חייו.", "הסיכון בהחלטה שגויה עדיף על האימה שבחוסר החלטה."]
     },
     {
-        philosopherId: "machiavelli",
+        philosopherId: "niccolo_machiavelli",
         quotesEn: ["It is better to be feared than loved, if you cannot be both.", "The ends justify the means."],
         quotesHe: ["עדיף להיות מפחיד מאשר אהוב, אם אינך יכול להיות שניהם.", "המטרה מקדשת את האמצעים."]
     },
     {
-        philosopherId: "hobbes",
+        philosopherId: "thomas_hobbes",
         quotesEn: ["Life in the state of nature is solitary, poor, nasty, brutish, and short.", "Curiosity is the lust of the mind."],
         quotesHe: ["החיים במצב הטבע הם בודדים, דלים, מאוסים, בהמיים וקצרים.", "סקרנות היא התאווה של המוח."]
     },
     {
-        philosopherId: "descartes",
+        philosopherId: "rene_descartes",
         quotesEn: ["I think, therefore I am.", "It is not enough to have a good mind; the main thing is to use it well."],
         quotesHe: ["אני חושב, משמע אני קיים.", "אין די בכך שיש לך שכל טוב, העיקר הוא להשתמש בו היטב."]
     },
     {
-        philosopherId: "spinoza",
+        philosopherId: "baruch_spinoza",
         quotesEn: ["I have striven not to laugh at human actions, not to weep at them, nor to hate them, but to understand them.", "Fear cannot be without hope nor hope without fear."],
         quotesHe: ["השתדלתי לא לצחוק על מעשי בני האדם, לא לבכות עליהם, ולא לשנוא אותם, אלא להבינם.", "פחד אינו יכול להיות ללא תקווה, ותקווה ללא פחד."]
     },
     {
-        philosopherId: "locke",
+        philosopherId: "john_locke",
         quotesEn: ["No man's knowledge here can go beyond his experience.", "All mankind... being all equal and independent, no one ought to harm another in his life, health, liberty or possessions."],
         quotesHe: ["שום ידע של אדם כאן אינו יכול לחרוג מעבר לניסיונו.", "כל בני האדם... בהיותם שווים ועצמאיים, אסור לאיש לפגוע באחר בחייו, בריאותו, חירותו או רכושו."]
     },
     {
-        philosopherId: "leibniz",
+        philosopherId: "gw_leibniz",
         quotesEn: ["We live in the best of all possible worlds.", "Music is a hidden arithmetic exercise of the soul, which does not know that it is counting."],
         quotesHe: ["אנו חיים בטוב שבכל העולמות האפשריים.", "מוזיקה היא תרגיל חשבוני נסתר של הנשמה, שאינה יודעת שהיא סופרת."]
     },
@@ -120,7 +120,7 @@ export default [
         quotesHe: ["התבונה היא, וצריכה להיות רק, עבד לתשוקות.", "אדם חכם מתאים את אמונתו לראיות."]
     },
     {
-        philosopherId: "rousseau",
+        philosopherId: "jean_jacques_rousseau",
         quotesEn: ["Man is born free, and everywhere he is in chains.", "The world of reality has its limits; the world of imagination is boundless."],
         quotesHe: ["האדם נולד חופשי, ובכל מקום הוא כבול בשלשלאות.", "לעולם המציאות יש גבולות; עולם הדמיון הוא חסר גבולות."]
     },
@@ -130,32 +130,32 @@ export default [
         quotesHe: ["פעל רק לפי אותו הכלל המעשי שתוכל לרצות, באותה עת, שיהיה לחוק כללי.", "שני דברים ממלאים את הנפש בהערצה ויראת כבוד... השמיים זרועי הכוכבים שמעליי והחוק המוסרי שבתוכי."]
     },
     {
-        philosopherId: "hegel",
+        philosopherId: "georg_wilhelm_friedrich_hegel",
         quotesEn: ["The real is the rational and the rational is the real.", "Nothing great in the world has ever been accomplished without passion."],
         quotesHe: ["הממשי הוא הרציונלי והרציונלי הוא הממשי.", "שום דבר גדול בעולם לא הושג מעולם ללא תשוקה."]
     },
     {
-        philosopherId: "schopenhauer",
+        philosopherId: "arthur_schopenhauer",
         quotesEn: ["Life is a constant process of dying.", "Compassion is the basis of morality."],
         quotesHe: ["החיים הם תהליך מתמיד של גסיסה.", "חמלה היא הבסיס למוסר."]
     },
     {
-        philosopherId: "kierkegaard",
+        philosopherId: "soren_kierkegaard",
         quotesEn: ["Life can only be understood backwards; but it must be lived forwards.", "Anxiety is the dizziness of freedom."],
         quotesHe: ["החיים יכולים להיות מובנים רק לאחור; אך חייבים לחיות אותם קדימה.", "חרדה היא הסחרחורת של החופש."]
     },
     {
-        philosopherId: "marx",
+        philosopherId: "karl_marx",
         quotesEn: ["The philosophers have only interpreted the world, in various ways. The point, however, is to change it.", "Workers of the world, unite!"],
         quotesHe: ["הפילוסופים רק פירשו את העולם בדרכים שונות. הנקודה, עם זאת, היא לשנות אותו.", "פועלי כל העולם, התאחדו!"]
     },
     {
-        philosopherId: "nietzsche",
+        philosopherId: "friedrich_nietzsche",
         quotesEn: ["God is dead.", "That which does not kill us makes us stronger."],
         quotesHe: ["אלוהים מת.", "מה שלא הורג אותי מחשק אותי."]
     },
     {
-        philosopherId: "husserl",
+        philosopherId: "edmund_husserl",
         quotesEn: ["To the things themselves!", "Experience by itself is not science."],
         quotesHe: ["אל הדברים עצמם!", "ניסיון כשלעצמו אינו מדע."]
     },
@@ -180,12 +180,12 @@ export default [
         quotesHe: ["גבולות השפה שלי הם גבולות העולם שלי.", "על מה שאי אפשר לדבר, על כך יש לשתוק."]
     },
     {
-        philosopherId: "arendt",
+        philosopherId: "hannah_arendt",
         quotesEn: ["The sad truth is that most evil is done by people who never make up their minds to be good or evil.", "Power and violence are opposites."],
         quotesHe: ["האמת העצובה היא שרוב הרוע נעשה על ידי אנשים שמעולם לא החליטו להיות טובים או רעים.", "כוח ואלימות הם הפכים."]
     },
     {
-        philosopherId: "de_beauvoir",
+        philosopherId: "simone_de_beauvoir",
         quotesEn: ["One is not born, but rather becomes, a woman.", "Change your life today. Don't gamble on the future, act now, without delay."],
         quotesHe: ["אישה אינה נולדת אישה, אלא נעשית אישה.", "שנה את חייך היום. אל תהמר על העתיד, פעל עכשיו, ללא דיחוי."]
     },

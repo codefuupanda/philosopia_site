@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useMemo } from 'react';
 import { Link } from "react-router-dom";
 import {
   Quote,
@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { useLanguage } from "../i18n/LanguageContext";
 import { texts } from "../i18n/texts";
-import { api } from "../lib/api";
+import { usePhilosophersList } from "../hooks/queries";
 import { Logo } from "../components/ui/Logo";
 import { Loader } from '../components/ui/Loader';
 import { cn } from "../lib/utils";
@@ -23,41 +23,21 @@ function HomePage() {
   const isHebrew = language === "he";
   const basePath = isHebrew ? "/he" : "/en";
 
-  const [randomPhilosopher, setRandomPhilosopher] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const hasFetched = useRef(false);
+  const { data, isLoading } = usePhilosophersList({ page: 1, limit: 50 });
 
-  // Fetch once via cached API layer. Store raw data (both languages)
-  // so language toggles don't trigger a re-fetch.
-  useEffect(() => {
-    if (hasFetched.current) return;
-    hasFetched.current = true;
-
-    const fetchRandomPhilosopher = async () => {
-      try {
-        const data = await api.getPhilosophers({ page: 1, limit: 50 });
-        const allPhilosophers = data.philosophers || [];
-
-        if (allPhilosophers.length > 0) {
-          const random = allPhilosophers[Math.floor(Math.random() * allPhilosophers.length)];
-          setRandomPhilosopher(random);
-        }
-      } catch (err) {
-        console.error("Error fetching philosopher:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchRandomPhilosopher();
-  }, []);
+  // Pick once per dataset — the raw data holds both languages, so language
+  // toggles neither re-fetch nor re-roll the spotlight philosopher.
+  const randomPhilosopher = useMemo(() => {
+    const allPhilosophers = data?.philosophers || [];
+    if (allPhilosophers.length === 0) return null;
+    return allPhilosophers[Math.floor(Math.random() * allPhilosophers.length)];
+  }, [data]);
 
   return (
     <div className="space-y-16 pb-20">
 
       {/* 1. HERO SECTION */}
-      
-      {/*<section className="relative min-h-[70vh] flex flex-col items-center justify-center overflow-hidden rounded-3xl bg-background border border-amber-500/30 p-8 md:p-16 text-center shadow-2xl shadow-amber-900/10">
+      <section className="relative min-h-[70vh] flex flex-col items-center justify-center overflow-hidden rounded-3xl bg-background border border-amber-500/30 p-8 md:p-16 text-center shadow-2xl shadow-amber-900/10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-amber-500/10 via-background to-background"></div>
         <div className="absolute inset-0 opacity-30 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] [background-size:16px_16px]"></div>
 
@@ -88,7 +68,7 @@ function HomePage() {
             </Link>
           </div>
         </div>
-      </section>*/}
+      </section>
 
       {/* 2. ABOUT SECTION */}
       <AboutSection />
@@ -196,14 +176,15 @@ function HomePage() {
       </section>
 
       {/* 4. THE STOA (Quotes Gateway) */}
-      {/*<section className="py-20 text-center px-4 bg-gradient-to-b from-transparent to-muted/20">
+      <section className="py-20 text-center px-4 bg-gradient-to-b from-transparent to-muted/20">
         <div className="max-w-2xl mx-auto space-y-8">
           <Quote className="w-12 h-12 text-amber-500/50 mx-auto" />
           <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground">
             {isHebrew ? "איזו חוכמה אתם מחפשים?" : "What wisdom do you seek?"}
           </h2>
           <div className="flex flex-wrap justify-center gap-4">
-            {["Ethics", "Meaning", "Politics"].map((topic) => (
+            {/* These must match tags that exist on the quote entities (case-insensitive) */}
+            {["Ethics", "Wisdom", "Knowledge"].map((topic) => (
               <Link
                 key={topic}
                 to={`${basePath}/quotes?tag=${topic.toLowerCase()}`}
@@ -216,7 +197,7 @@ function HomePage() {
             ))}
           </div>
         </div>
-      </section>*/}
+      </section>
 
     </div>
   );

@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { api } from '../lib/api';
+import { useWorks } from '../hooks/queries';
 import { texts } from '../i18n/texts';
 import { WorkCard } from '../components/WorkCard';
 import { Loader } from '../components/ui/Loader';
@@ -13,25 +13,9 @@ export default function WorksPage() {
     const t = texts[lang];
     const isRtl = lang === 'he';
 
-    const [works, setWorks] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const { data: works = [], isLoading: loading } = useWorks(lang);
     const [search, setSearch] = useState('');
     const [groupBy, setGroupBy] = useState('philosopher'); // 'philosopher' | 'none'
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                setLoading(true);
-                const data = await api.getWorks(lang);
-                setWorks(data);
-            } catch (err) {
-                console.error("Failed to load works", err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
-    }, [lang]);
 
     // Filter works by search term (matches title or philosopher name)
     const filtered = useMemo(() => {

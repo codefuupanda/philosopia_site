@@ -1,34 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 import { useLanguage } from '../i18n/LanguageContext';
+import { useSchools } from '../hooks/queries';
 import { Library } from 'lucide-react';
 import { Loader } from '../components/ui/Loader';
-
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL //|| 'http://localhost:5000/api';
 
 export default function SchoolsPage() {
   const { language } = useLanguage();
   const isHebrew = language === 'he';
 
-  const [schools, setSchools] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchSchools = async () => {
-      try {
-        const res = await axios.get(`${API_BASE_URL}/schools`);
-        setSchools(res.data.schools || []);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchSchools();
-  }, []);
+  const { data, isLoading: loading, isError } = useSchools();
+  const schools = data?.schools ?? [];
 
   if (loading) return <div className="p-20 flex justify-center"><Loader /></div>;
+  if (isError) return <div className="p-20 text-center text-destructive">{isHebrew ? 'שגיאה בטעינת האסכולות.' : 'Error loading schools.'}</div>;
 
   return (
     <div dir={isHebrew ? 'rtl' : 'ltr'} className="container max-w-6xl mx-auto py-12 px-4">

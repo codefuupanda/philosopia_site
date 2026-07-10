@@ -14,6 +14,7 @@ export const texts = {
     navBeefs: "ריבים",
     navSchools: "אסכולות",
     navConcepts: "קונספטים",
+    navGraph: "מפת קשרים",
     navArtAndPhilo: "אמנות ופילוסופיה",
 
     periods_title: "ציר הזמן הפילוסופי",
@@ -91,6 +92,7 @@ export const texts = {
     navBeefs: "Beefs",
     navSchools: "Schools",
     navConcepts: "Concepts",
+    navGraph: "Graph",
     navArtAndPhilo: "Art & Philosophy",
 
     periods_title: "The Philosophical Timeline",

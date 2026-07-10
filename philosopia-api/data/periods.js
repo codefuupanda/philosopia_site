@@ -28,6 +28,13 @@ export default [
         startYear: 400, endYear: 1400
     },
     {
+        id: "renaissance_period",
+        nameEn: "Renaissance",
+        nameHe: "הרנסאנס",
+        descriptionHe: "לידה מחדש של ההומניזם; המחשבה המדינית והמדעית משתחררת מהתאולוגיה.",
+        startYear: 1400, endYear: 1600
+    },
+    {
         id: "early_modern_period",
         nameEn: "Early Modern",
         nameHe: "העת החדשה המוקדמת",

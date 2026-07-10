@@ -1,35 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useParams, Link } from "react-router-dom";
-import axios from "axios";
 import { useLanguage } from "../i18n/LanguageContext";
+import { useBeef } from "../hooks/queries";
 import { Loader } from '../components/ui/Loader';
-
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL //|| 'http://localhost:5000/api';
 
 export default function BeefDetailPage() {
   const { id } = useParams();
   const { language } = useLanguage();
   const isHebrew = language === "he";
 
-  const [beef, setBeef] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchBeef() {
-      try {
-        const res = await axios.get(`${API_BASE_URL}/beefs/${id}`);
-        setBeef(res.data.beef);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchBeef();
-  }, [id]);
+  const { data, isLoading: loading, isError } = useBeef(id);
+  const beef = data?.beef;
 
   if (loading) return <div className="p-20 flex justify-center"><Loader /></div>;
-  if (!beef) return <div className="p-20 text-center">Beef Not Found</div>;
+  if (isError || !beef) return <div className="p-20 text-center">Beef Not Found</div>;
 
   const title = isHebrew ? beef.titleHe : beef.titleEn;
   const description = isHebrew ? beef.descriptionHe : beef.descriptionEn;

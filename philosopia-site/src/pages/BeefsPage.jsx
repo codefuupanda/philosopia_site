@@ -1,33 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 import { useLanguage } from "../i18n/LanguageContext";
+import { useBeefs } from "../hooks/queries";
 import { Swords } from "lucide-react";
 import { Loader } from '../components/ui/Loader';
-
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL //|| 'http://localhost:5000/api';
 
 export default function BeefsPage() {
   const { language } = useLanguage();
   const isHebrew = language === "he";
   const navigate = useNavigate();
 
-  const [beefs, setBeefs] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchBeefs() {
-      try {
-        const res = await axios.get(`${API_BASE_URL}/beefs`);
-        setBeefs(res.data.beefs || []);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchBeefs();
-  }, []);
+  const { data, isLoading: loading, isError } = useBeefs();
+  const beefs = data?.beefs ?? [];
 
   // Helper to handle navigation to detail page
   const handleCardClick = (beefId) => {
@@ -41,6 +25,7 @@ export default function BeefsPage() {
   };
 
   if (loading) return <div className="p-20 flex justify-center"><Loader /></div>;
+  if (isError) return <div className="p-20 text-center text-destructive">{isHebrew ? 'שגיאה בטעינת הריבים.' : 'Error loading beefs.'}</div>;
 
   return (
     <div dir={isHebrew ? 'rtl' : 'ltr'} className="container max-w-4xl mx-auto py-12 px-4">

@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useParams, Link } from "react-router-dom";
 import { useLanguage } from "../i18n/LanguageContext";
 import { texts } from "../i18n/texts";
-import axios from "axios";
+import { usePeriod, usePhilosophersList } from "../hooks/queries";
 import { Loader } from '../components/ui/Loader';
-
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL //|| "http://localhost:5000/api";
 
 const PhilosopherCard = ({ philosopher, isHebrew }) => (
     <Link
@@ -45,45 +43,17 @@ export default function PeriodDetailPage() {
     const { periodId } = useParams();
     const isHebrew = language === "he";
 
-    const [period, setPeriod] = useState(null);
-    const [philosophers, setPhilosophers] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState(null);
+    // Two independent queries — React Query runs them in parallel
+    const periodQuery = usePeriod(periodId);
+    const philosophersQuery = usePhilosophersList({ periodId });
 
-    useEffect(() => {
-        const fetchData = async () => {
-            setIsLoading(true);
-            setError(null);
+    const period = periodQuery.data?.period;
+    const philosophers = philosophersQuery.data?.philosophers ?? [];
 
-            try {
-                // 1. Fetch Period Details
-                const periodResponse = await axios.get(`${API_BASE_URL}/periods/${periodId}`);
-
-                if (!periodResponse.data.period) {
-                    throw new Error("Period data missing in response");
-                }
-                const periodData = periodResponse.data.period;
-                setPeriod(periodData);
-
-                // 2. Fetch Philosophers for this period
-                const philosophersResponse = await axios.get(`${API_BASE_URL}/philosophers?periodId=${periodId}`);
-
-                if (!philosophersResponse.data.philosophers) {
-                    throw new Error("Failed to fetch philosophers for this period");
-                }
-
-                setPhilosophers(philosophersResponse.data.philosophers);
-
-            } catch (err) {
-                console.error("Error fetching data:", err);
-                setError(t.error_loading_data || "Failed to load period details and philosophers.");
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchData();
-    }, [periodId, t]);
+    const isLoading = periodQuery.isLoading || philosophersQuery.isLoading;
+    const error = (periodQuery.isError || philosophersQuery.isError || (!isLoading && !period))
+        ? (t.error_loading_data || "Failed to load period details and philosophers.")
+        : null;
 
     if (isLoading) {
         return <div className="py-20 flex justify-center"><Loader /></div>;

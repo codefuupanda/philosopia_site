@@ -1,6 +1,7 @@
 import express from "express";
 import { listByType, getById } from "../db/content.js";
 import { withFlatAliases, withFlatAliasesList } from "../db/aliases.js";
+import { withResolvedRelations, buildNetwork } from "../db/philosopherGraph.js";
 
 const router = express.Router();
 
@@ -46,6 +47,19 @@ router.get("/", async (req, res) => {
   }
 });
 
+// GET /api/philosophers/graph/network — whole-catalog nodes/links for the
+// relation graph viz. MUST stay registered before "/:id" (which would
+// otherwise swallow "graph" as a philosopher id).
+router.get("/graph/network", async (req, res) => {
+  try {
+    const network = await buildNetwork();
+    res.json(network);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server Error" });
+  }
+});
+
 // GET /api/philosophers/:id (Detail + Linked Concepts)
 router.get("/:id", async (req, res) => {
   try {
@@ -55,6 +69,9 @@ router.get("/:id", async (req, res) => {
       return res.status(404).json({ error: "Philosopher not found" });
     }
 
+    // Resolve relation QIDs to internal ids + synthesize inferred reverse edges
+    const resolved = await withResolvedRelations(philosopher);
+
     // Concepts link back to philosophers by string business id
     const concepts = await listByType("concept");
     const linkedConcepts = concepts
@@ -62,7 +79,7 @@ router.get("/:id", async (req, res) => {
       .map((c) => withFlatAliases("concept", { id: c.id, name: c.name, summary: c.summary }));
 
     res.json({
-      philosopher: withFlatAliases("philosopher", philosopher),
+      philosopher: withFlatAliases("philosopher", resolved),
       linkedConcepts,
     });
 

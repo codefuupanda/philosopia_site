@@ -1,34 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 import { useLanguage } from '../i18n/LanguageContext';
+import { useConcepts } from '../hooks/queries';
 import { Lightbulb } from 'lucide-react';
 import { Loader } from '../components/ui/Loader';
-
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL //|| 'http://localhost:5000/api';
 
 export default function ConceptsPage() {
   const { language } = useLanguage();
   const isHebrew = language === 'he';
 
-  const [concepts, setConcepts] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchConcepts = async () => {
-      try {
-        const res = await axios.get(`${API_BASE_URL}/concepts`);
-        setConcepts(res.data.concepts || []);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchConcepts();
-  }, []);
+  const { data, isLoading: loading, isError } = useConcepts();
+  const concepts = data?.concepts ?? [];
 
   if (loading) return <div className="p-20 flex justify-center"><Loader /></div>;
+  if (isError) return <div className="p-20 text-center text-destructive">{isHebrew ? 'שגיאה בטעינת המושגים.' : 'Error loading concepts.'}</div>;
 
   return (
     <div dir={isHebrew ? 'rtl' : 'ltr'} className="container max-w-6xl mx-auto py-12 px-4">

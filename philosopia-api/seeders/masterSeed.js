@@ -3,6 +3,9 @@ import colors from 'colors';
 
 // List of scripts in the exact execution order
 const scripts = [
+    // Fail-loud guard: aborts the seed if any data file references a philosopher
+    // id that doesn't exist in data/philosophers.json (instead of silent skips).
+    { name: '0. Validate Seed Data (id cross-reference)', path: 'scripts/validateSeedData.js' },
     { name: '1. Basic Philosophers (Skeleton)', path: 'seeders/seeder.js' },
     { name: '2. Library (Works & Quotes)', path: 'seeders/seed_library.js' },
     { name: '3. Additional Quotes', path: 'seeders/quoteSeeder.js' },

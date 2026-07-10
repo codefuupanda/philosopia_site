@@ -1,35 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import axios from 'axios';
 import { useLanguage } from '../i18n/LanguageContext';
+import { useSchool } from '../hooks/queries';
 import { Loader } from '../components/ui/Loader';
-
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL //|| 'http://localhost:5000/api';
 
 export default function SchoolDetailPage() {
   const { id } = useParams();
   const { language } = useLanguage();
   const isHebrew = language === 'he';
 
-  const [school, setSchool] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchSchool = async () => {
-      try {
-        const res = await axios.get(`${API_BASE_URL}/schools/${id}`);
-        setSchool(res.data.school);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchSchool();
-  }, [id]);
+  const { data, isLoading: loading, isError } = useSchool(id);
+  const school = data?.school;
 
   if (loading) return <div className="p-20 flex justify-center"><Loader /></div>;
-  if (!school) return <div className="p-20 text-center">School Not Found</div>;
+  if (isError || !school) return <div className="p-20 text-center">School Not Found</div>;
 
   const name = isHebrew ? school.nameHe : school.nameEn;
   const description = isHebrew ? school.descriptionHe : school.descriptionEn;
