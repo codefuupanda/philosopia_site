@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "philosopia-site",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start:site"],
+      "port": 3000
+    },
+    {
+      "name": "philosopia-api",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start:api"],
+      "port": 5001
+    }
+  ]
+}

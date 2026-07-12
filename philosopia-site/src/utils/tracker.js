@@ -10,7 +10,7 @@
  *   tracker.event('button', 'click', 'CTA'); // track custom events
  */
 
-const API_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api') + '/analytics/events';
+const API_URL = (import.meta.env.VITE_API_BASE_URL || '/api') + '/analytics/events';
 
 // Generate a random session ID (persists for the tab's lifetime)
 const sessionId = Math.random().toString(36).slice(2) + Date.now().toString(36);

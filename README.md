@@ -6,7 +6,7 @@
 
 - **Rich bilingual biographies — 66/66 coverage.** Every philosopher has a full English *and* Hebrew biography, auto-enriched from Wikipedia/Wikidata (portraits, life years, influences, students, citizenship), with a curated bilingual summary as a graceful fallback.
 - **True bilingual UI (RTL/LTR).** All content is stored in English and Hebrew; URLs are prefixed `/en/` or `/he/`, fonts swap per language (Playfair Display/Inter for EN, Frank Ruhl Libre/Heebo for HE), and right-to-left layout applies automatically for Hebrew.
-- **Interactive relationship graph.** Philosopher relations from Wikidata are resolved against our own catalog: teachers, influences, students, and followers render as clickable chips that navigate between profiles, and a **force-directed influence map** (`/graph`) visualizes the whole network — era-colored nodes sized by influence, hover-highlighted neighborhoods, dashed inferred edges, and click-through to profiles, fully theme- and RTL-aware. Reverse edges are inferred automatically — Socrates shows Aristotle and Nietzsche among his followers even though Wikidata only states the relation from their side. No graph database required — the whole graph lives in memory.
+- **Interactive relationship graph.** Philosopher relations from Wikidata are resolved against our own catalog: teachers, influences, students, and followers render as clickable chips that navigate between profiles, and a **force-directed influence map** (the **Graph** view on the Philosophers page, `?view=graph`; the old `/graph` URL redirects there) visualizes the whole network — era-colored nodes sized by influence, hover-highlighted neighborhoods, dashed inferred edges, and click-through to profiles, fully theme- and RTL-aware. The physics are tuned so the network spreads out readably on load, and you can **drag any node to pin it in place** (a dashed halo marks pinned nodes) — **right-click a pinned node to release it** back into the simulation. A control bar above the canvas turns the map into an analytical tool: color nodes by **school of thought** (auto-assigned palette + legend) or by era, toggle **Highlight Influence** to scale each thinker by their number of connections, toggle **Group by School** to pull same-school philosophers into visual islands, and **click any node to spotlight** its direct influences (click again or click the background to clear; double-click opens the profile). Reverse edges are inferred automatically — Socrates shows Aristotle and Nietzsche among his followers even though Wikidata only states the relation from their side. No graph database required — the whole graph lives in memory.
 - **Global search (⌘K).** A command palette over the whole catalog — philosophers, schools, concepts, and beefs — with fuzzy matching in both English and Hebrew, grouped results, and keyboard-first navigation.
 - **Philosophical "Beefs".** Historical disagreements (e.g. Rationalism vs. Empiricism) framed in a fun, engaging way.
 - **Timeline & schools.** A chronological philosopher timeline from the Pre-Socratics to the 20th century, plus schools-of-thought pages with their member philosophers.
@@ -29,7 +29,7 @@
 
 ```
 philosopia_site/
-├── philosopia-api/     # Express.js REST API (backend, port 5000)
+├── philosopia-api/     # Express.js REST API (backend, port 5001)
 ├── philosopia-site/    # React SPA (frontend, port 3000)
 ├── docker-compose.yml  # Orchestrates both services
 └── package.json        # Root scripts (concurrently)
@@ -58,7 +58,7 @@ Both services read a local `.env` file (gitignored — never commit credentials)
 **`philosopia-api/.env`**
 
 ```
-PORT=5000
+PORT=5001
 
 # --- DynamoDB (live database) ---
 AWS_REGION=us-east-1
@@ -71,11 +71,13 @@ DYNAMO_TABLE_PREFIX=philosopia
 JWT_SECRET=<long random string, e.g. `openssl rand -hex 48`>
 ```
 
-**`philosopia-site/.env`** — points the React app at the API port:
+**`philosopia-site/.env`** — the API base path (optional; the code defaults to `/api`):
 
 ```
-VITE_API_BASE_URL=http://localhost:5000/api
+VITE_API_BASE_URL=/api
 ```
+
+The frontend calls relative `/api/...` URLs. In dev, the Vite server proxies `/api` to `http://localhost:5001` (see `vite.config.js`); in Docker/production, nginx does the same routing. All requests are same-origin, so there are no CORS issues. Only set an absolute URL here if you need to point the frontend at an API that isn't behind the proxy.
 
 > `.env` files are **not** copied into new git worktrees — copy them from the main checkout manually if you create one.
 
@@ -92,7 +94,7 @@ npm run seed           # seeds all content (validates seed data first, fails lou
 
 The backend and frontend are separate processes and must run **simultaneously in separate terminals**:
 
-**Terminal 1 — Backend / API** (port **5000**):
+**Terminal 1 — Backend / API** (port **5001**):
 
 ```bash
 cd philosopia-api
@@ -106,9 +108,9 @@ cd philosopia-site
 npm start
 ```
 
-Then open **http://localhost:3000** (the API health check is at http://localhost:5000/api/health).
+Then open **http://localhost:3000** (the API health check is at http://localhost:5001/api/health).
 
-> **macOS gotcha:** AirPlay Receiver squats port **5000**. If the API fails to bind (or `curl localhost:5000` answers with something odd), disable AirPlay Receiver in System Settings → General → AirDrop & Handoff, or check `lsof -nP -iTCP:5000` for a `ControlCe` process.
+> **Why port 5001?** macOS AirPlay Receiver occupies port 5000, so the API runs on **5001** to avoid the conflict — no need to change any system settings. If the API won't bind, check `lsof -nP -iTCP:5001` for whatever is holding the port.
 
 **Alternative — single terminal:** from the repo root, `npm run dev` runs both processes together via `concurrently` (API in blue, frontend in green).
 
@@ -119,7 +121,7 @@ docker-compose up      # build and start both containers
 docker-compose up -d   # detached mode
 ```
 
-In Docker, the frontend is built with `VITE_API_BASE_URL=/api` and nginx proxies `/api/` to the API container; the frontend waits for the API's healthcheck before starting.
+In Docker, the frontend is built with `VITE_API_BASE_URL=/api` and nginx proxies `/api/` to the API container (the same same-origin pattern the Vite dev proxy uses locally); the frontend waits for the API's healthcheck before starting.
 
 ## Useful Commands
 
@@ -135,7 +137,7 @@ npm run seed          # Seed the database
 **Backend** (`philosopia-api/`)
 
 ```bash
-npm run dev            # nodemon dev server, port 5000
+npm run dev            # nodemon dev server, port 5001
 npm start              # Production start
 npm run setup:tables   # One-off table provisioning (idempotent)
 npm run seed:all       # Full seed via masterSeed.js

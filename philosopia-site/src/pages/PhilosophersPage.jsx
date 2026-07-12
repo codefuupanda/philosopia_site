@@ -3,9 +3,10 @@ import { Link, useSearchParams } from "react-router-dom";
 import { useLanguage } from "../i18n/LanguageContext";
 import { usePhilosophersList, usePeriods } from "../hooks/queries";
 import { texts } from "../i18n/texts";
-import { Brain, ChevronLeft, ChevronRight, LayoutGrid, Clock } from 'lucide-react';
+import { Brain, ChevronLeft, ChevronRight, LayoutGrid, Clock, Network } from 'lucide-react';
 import { Loader } from '../components/ui/Loader';
 import { AlphaNav } from '../components/AlphaNav';
+import { RelationshipGraph } from '../components/RelationshipGraph';
 
 // Timeline view imports
 import { Card } from "../components/ui/Card";
@@ -14,7 +15,7 @@ import { Badge } from "../components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "../components/ui/dialog";
 import { Separator } from "../components/ui/separator";
 import { ScrollArea } from "../components/ui/scroll-area";
-import { Scroll, Quote, BookOpen, ArrowRight, Menu } from 'lucide-react';
+import { Quote, BookOpen, ArrowRight, Menu } from 'lucide-react';
 
 const PAGE_SIZE = 12;
 
@@ -275,13 +276,38 @@ const formatYear = (y) => {
   return y < 0 ? `${Math.abs(y)} BCE` : `${y} CE`;
 };
 
+// ── Chronological sorting ────────────────────────────────────────────────────
+// Birth-year sort key parsed from the English years string. Formats in the
+// data: "624–546 BCE" (one era marker after the range, governs both ends),
+// "121–180 AD", "1138–1204" (bare CE), "4 BCE – 65 AD" (mixed eras),
+// "c. 310–235 BCE", "5th Century BCE". BCE maps to negative years, so
+// 470 BCE (-470) correctly sorts before 384 BCE (-384).
+const birthYearOf = (phil) => {
+  const s = phil.yearsEn || phil.dates || "";
+  // "5th Century BCE" → mid-century estimate (e.g. -450)
+  const century = s.match(/(\d+)(?:st|nd|rd|th)\s*century\s*(BCE|BC)?/i);
+  if (century) {
+    const mid = century[1] * 100 - 50;
+    return century[2] ? -mid : mid;
+  }
+  const year = s.match(/\d{1,4}/); // first number in the string = birth year
+  if (!year) return Infinity; // unparseable → sort last
+  // The first era marker governs the birth year: in "624–546 BCE" the single
+  // trailing marker applies to both ends; in "4 BCE – 65 AD" it's the birth's.
+  const era = s.match(/BCE|BC|AD|CE/);
+  return era && era[0][0] === "B" ? -year[0] : +year[0];
+};
+
+const byBirthYear = (a, b) =>
+  birthYearOf(a) - birthYearOf(b) ||
+  (a.nameEn || "").localeCompare(b.nameEn || "");
+
 function TimelineView({ lang, isHebrew }) {
   const { data: periodsData, isLoading: loading } = usePeriods();
 
   const [activeEraIndex, setActiveEraIndex] = useState(0);
   const [activePhilosopherId, setActivePhilosopherId] = useState(null);
   const [selectedPhilosopher, setSelectedPhilosopher] = useState(null);
-  const [activeFilter] = useState("All");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const eras = useMemo(() => {
@@ -304,7 +330,10 @@ function TimelineView({ lang, isHebrew }) {
 
         const dates = `${formatYear(p.startYear)} - ${formatYear(p.endYear)}`;
 
-        return { ...p, nameEn, nameHe, dates };
+        // Strict chronological order within the period (oldest birth first)
+        const philosophers = [...(p.philosophers || [])].sort(byBirthYear);
+
+        return { ...p, nameEn, nameHe, dates, philosophers };
       });
 
     filteredEras.sort((a, b) => a.startYear - b.startYear);
@@ -492,10 +521,7 @@ function TimelineView({ lang, isHebrew }) {
       {/* MAIN CONTENT AREA */}
       <main className="flex-1 bg-background relative">
         {eras.map((era) => {
-          const eraPhilosophers = (era.philosophers || []).filter(phil => {
-            if (activeFilter === "All") return true;
-            return phil.tags && phil.tags.includes(activeFilter);
-          });
+          const eraPhilosophers = era.philosophers || []; // pre-sorted chronologically in the eras memo
 
           return (
             <section key={era.id} id={`era-${era.id}`} className="relative border-b border-amber-500/20 last:border-0 pb-20">
@@ -517,113 +543,112 @@ function TimelineView({ lang, isHebrew }) {
                 </div>
               </div>
 
-              {/* PHILOSOPHER LIST ("Zig-Zag Stream") */}
-              <div className="w-full max-w-[95%] 2xl:max-w-[1800px] mx-auto px-4 md:px-8 py-12 relative">
+              {/* PHILOSOPHER TIMELINE — central axis with alternating cards (desktop), start-rail stack (mobile) */}
+              <div className="w-full max-w-6xl mx-auto px-4 md:px-8 py-14 relative">
 
-                <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-px bg-amber-500/20 hidden md:block" />
+                {/* Axis — mobile: inline-start rail; desktop: center line */}
+                <div aria-hidden className="md:hidden absolute top-2 bottom-2 start-4 w-px bg-gradient-to-b from-primary/50 via-border to-primary/50" />
+                <div aria-hidden className="hidden md:block absolute top-2 bottom-2 left-1/2 -translate-x-1/2 w-px bg-gradient-to-b from-primary/50 via-border to-primary/50" />
 
-                <div className="flex flex-col md:block">
+                <div>
                   {eraPhilosophers.map((phil, pIndex) => {
-                    const isEven = pIndex % 2 === 0;
+                    const isStart = pIndex % 2 === 0; // card on the inline-start half on desktop
                     const isActive = activePhilosopherId === phil.id;
+                    const years = isHebrew ? (phil.yearsHe || phil.yearsEn) : (phil.yearsEn || phil.dates);
 
                     return (
                       <div
                         key={phil.id}
                         id={`phil-${phil.id}`}
-                        className={`
-                          relative flex flex-col mb-12 md:mb-24 last:mb-0
-                          md:w-[calc(50%-0.5rem)]
-                          ${isEven ? 'md:me-auto' : 'md:ms-auto'}
-                        `}
+                        className="relative mb-10 md:mb-14 last:mb-0"
                       >
-                        {/* Connector Line & Node */}
-                        <div className={`
-                          hidden md:flex items-center absolute top-8
-                          ${isEven ? '-right-[calc(3rem+1px)] flex-row' : '-left-[calc(3rem+1px)] flex-row-reverse'}
-                          w-[3rem]
-                        `}>
-                          <div className="flex-1 h-px bg-amber-500" />
-                          <div className={`
-                            w-8 h-8 rounded-full border border-amber-500 bg-background z-10 flex items-center justify-center
-                            ${isActive ? 'bg-amber-500 text-white shadow-[0_0_10px_#d97706]' : 'text-amber-500'}
-                          `}>
-                            {isEven ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
-                          </div>
-                        </div>
+                        {/* Axis node — mobile rail */}
+                        <div
+                          aria-hidden
+                          className={`md:hidden absolute top-6 start-4 -translate-x-1/2 rtl:translate-x-1/2 w-3 h-3 rounded-full border-2 transition-all duration-300 ${
+                            isActive
+                              ? 'bg-primary border-primary shadow-[0_0_10px_hsl(var(--primary)/0.6)]'
+                              : 'bg-background border-primary/60'
+                          }`}
+                        />
+
+                        {/* Axis node — desktop center line */}
+                        <div
+                          aria-hidden
+                          className={`hidden md:block absolute top-7 left-1/2 -translate-x-1/2 w-3.5 h-3.5 rounded-full border-2 z-10 transition-all duration-300 ${
+                            isActive
+                              ? 'bg-primary border-primary scale-125 shadow-[0_0_12px_hsl(var(--primary)/0.6)]'
+                              : 'bg-background border-primary/60'
+                          }`}
+                        />
+
+                        {/* Connector: axis → card (desktop) */}
+                        <div
+                          aria-hidden
+                          className={`hidden md:block absolute top-[35px] h-px w-10 bg-primary/30 ${
+                            isStart ? 'end-1/2' : 'start-1/2'
+                          }`}
+                        />
+
+                        {/* Life years riding the axis, opposite the card (desktop) */}
+                        <span
+                          className={`hidden md:block absolute top-[27px] font-mono text-xs tracking-wider text-primary whitespace-nowrap ${
+                            isStart ? 'start-[calc(50%+1.5rem)]' : 'end-[calc(50%+1.5rem)]'
+                          }`}
+                        >
+                          {years}
+                        </span>
 
                         {/* Card */}
-                        <Card
-                          className={`
-                            relative overflow-hidden
-                            bg-orange-50 dark:bg-slate-900
-                            border border-amber-500
-                            transition-all duration-500 ease-out
-                            group cursor-pointer
-                            ${isActive
-                              ? 'shadow-[0_0_15px_rgba(245,158,11,0.5)] ring-1 ring-amber-500'
-                              : 'hover:shadow-[0_0_15px_rgba(245,158,11,0.5)]'}
-                          `}
-                          onClick={() => setSelectedPhilosopher(phil)}
-                        >
-                          <div className="absolute inset-0 pointer-events-none border-[3px] border-black/5 dark:border-white/5 rounded-lg" />
-
-                          <div className="flex flex-col md:flex-row h-full relative z-10">
-                            {/* Image */}
-                            <div className="h-64 md:h-auto w-full md:w-56 shrink-0 overflow-hidden relative border-b md:border-b-0 md:border-e border-amber-500/20">
-                              <div className="absolute inset-0 bg-amber-900/10 mix-blend-multiply z-10 pointer-events-none transition-opacity duration-500 group-hover:opacity-0" />
-                              {phil.imageUrl ? (
-                                <img
-                                  src={phil.imageUrl}
-                                  alt={phil.nameEn}
-                                  className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110"
-                                />
-                              ) : (
-                                <div className="w-full h-full bg-muted flex items-center justify-center text-muted-foreground font-serif text-4xl opacity-20">
-                                  {phil.nameEn.substring(0, 1)}
-                                </div>
-                              )}
-                            </div>
-
-                            {/* Content */}
-                            <div className="flex-1 flex flex-col p-5">
-                              <div className="flex justify-between items-start mb-3">
-                                <div>
-                                  <h3 className="text-2xl font-serif font-bold text-slate-900 dark:text-slate-100 group-hover:text-amber-700 dark:group-hover:text-amber-400 transition-colors">
-                                    {isHebrew ? phil.nameHe : phil.nameEn}
-                                  </h3>
-                                  <div className="flex gap-2 mt-2">
-                                    <Badge variant="secondary" className="bg-slate-200 text-slate-800 dark:bg-slate-800 dark:text-slate-200 px-2 py-1 rounded-full text-xs font-mono tracking-wider">
-                                      {phil.dates}
-                                    </Badge>
-                                    {phil.schoolId && (
-                                      <Badge variant="outline" className="bg-slate-200 text-slate-800 border-none dark:bg-slate-800 dark:text-slate-200 px-2 py-1 rounded-full text-xs font-mono">
-                                        {phil.schoolId.replace(/_/g, ' ')}
-                                      </Badge>
-                                    )}
+                        <div className={`ms-10 ${isStart ? 'md:ms-0 md:me-auto' : 'md:ms-auto'} md:w-[calc(50%-3.5rem)]`}>
+                          <Card
+                            onClick={() => setSelectedPhilosopher(phil)}
+                            className={`group cursor-pointer overflow-hidden rounded-xl bg-card border transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-primary/50 ${
+                              isActive ? 'border-primary/60 shadow-lg ring-1 ring-primary/25' : 'border-border shadow-sm'
+                            }`}
+                          >
+                            <div className="flex items-start gap-4 p-5">
+                              {/* Portrait */}
+                              <div className="w-16 h-16 shrink-0 rounded-lg overflow-hidden border border-border bg-muted">
+                                {phil.imageUrl ? (
+                                  <img
+                                    src={phil.imageUrl}
+                                    alt={phil.nameEn}
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                  />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center font-serif text-2xl text-muted-foreground/50">
+                                    {phil.nameEn?.charAt(0)}
                                   </div>
-                                </div>
-                                <Scroll className="w-5 h-5 text-amber-500/50 group-hover:text-amber-600 transition-colors" />
+                                )}
                               </div>
 
-                              <p className="text-slate-700 dark:text-slate-300 text-sm line-clamp-6 leading-relaxed mb-4 flex-1 font-serif">
-                                {isHebrew
-                                  ? (phil.bigIdeaHe || phil.summaryHe || phil.bigIdeaEn || phil.summaryEn)
-                                  : (phil.bigIdeaEn || phil.summaryEn || "No description available.")}
-                              </p>
+                              <div className="min-w-0 flex-1">
+                                <h3 className="font-serif font-bold text-lg leading-snug text-foreground group-hover:text-primary transition-colors">
+                                  {isHebrew ? phil.nameHe : phil.nameEn}
+                                </h3>
 
-                              <div className="flex items-center justify-between pt-4 border-t border-amber-500/20">
-                                <div className="flex gap-2">
-                                  {phil.tags && phil.tags.slice(0, 2).map(tag => (
-                                    <span key={tag} className="text-[10px] text-muted-foreground/70 uppercase tracking-widest">
-                                      #{tag}
+                                <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-1.5">
+                                  {/* Years badge — mobile only; desktop shows them on the axis */}
+                                  <Badge className="md:hidden bg-primary/10 text-primary border border-primary/25 hover:bg-primary/10 rounded-full px-2.5 py-0.5 font-mono text-[11px] tracking-wide">
+                                    {years}
+                                  </Badge>
+                                  {phil.schoolId && (
+                                    <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                                      {phil.schoolId.replace(/_/g, ' ')}
                                     </span>
-                                  ))}
+                                  )}
                                 </div>
+
+                                <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2 mt-3">
+                                  {isHebrew
+                                    ? (phil.bigIdeaHe || phil.summaryHe || phil.bigIdeaEn || phil.summaryEn)
+                                    : (phil.bigIdeaEn || phil.summaryEn)}
+                                </p>
                               </div>
                             </div>
-                          </div>
-                        </Card>
+                          </Card>
+                        </div>
                       </div>
                     );
                   })}
@@ -702,7 +727,22 @@ function TimelineView({ lang, isHebrew }) {
   );
 }
 
-// ─── Main Page (with toggle) ─────────────────────────────────────────────────
+// ─── Graph View ──────────────────────────────────────────────────────────────
+
+function GraphView({ isHebrew }) {
+  return (
+    <div dir={isHebrew ? 'rtl' : 'ltr'} className="container max-w-6xl mx-auto py-8 px-4">
+      <p className="text-muted-foreground max-w-2xl mb-6">
+        {isHebrew
+          ? 'רשת ההשפעות בין הוגי ההיסטוריה — מי לימד את מי, ומי המשיך את דרכו של מי, על פי נתוני Wikidata.'
+          : 'The network of influence across the history of thought — who taught whom, and who carried whose ideas forward, according to Wikidata.'}
+      </p>
+      <RelationshipGraph />
+    </div>
+  );
+}
+
+// ─── Main Page (with view switcher) ──────────────────────────────────────────
 
 export default function PhilosophersPage() {
   const { language: lang } = useLanguage();
@@ -710,12 +750,15 @@ export default function PhilosophersPage() {
   const t = texts[lang];
   const [searchParams, setSearchParams] = useSearchParams();
 
+  // Synced to ?view= so each view is bookmarkable/shareable
   const view = searchParams.get("view") || "timeline";
+  const setView = (next) => setSearchParams({ view: next });
 
-  const toggleView = () => {
-    const next = view === "timeline" ? "grid" : "timeline";
-    setSearchParams({ view: next });
-  };
+  const viewTabs = [
+    { key: "timeline", label: t.view_timeline, Icon: Clock },
+    { key: "grid", label: t.view_grid, Icon: LayoutGrid },
+    { key: "graph", label: t.view_graph, Icon: Network },
+  ];
 
   return (
     <div className="w-full">
@@ -734,28 +777,37 @@ export default function PhilosophersPage() {
             </p>
           </div>
 
-          <button
-            onClick={toggleView}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border border-border bg-card hover:bg-primary/10 hover:border-primary/30 transition-colors shrink-0"
+          {/* View switcher — Timeline | Grid | Graph */}
+          <div
+            role="tablist"
+            aria-label={isHebrew ? "בחירת תצוגה" : "Choose view"}
+            className="flex items-center gap-1 p-1 rounded-lg border border-border bg-card shadow-sm shrink-0"
           >
-            {view === "timeline" ? (
-              <>
-                <LayoutGrid className="w-4 h-4" />
-                {t.view_grid}
-              </>
-            ) : (
-              <>
-                <Clock className="w-4 h-4" />
-                {t.view_timeline}
-              </>
-            )}
-          </button>
+            {viewTabs.map(({ key, label, Icon }) => (
+              <button
+                key={key}
+                role="tab"
+                aria-selected={view === key}
+                onClick={() => setView(key)}
+                className={`flex items-center gap-2 px-3.5 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
+                  view === key
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground hover:bg-primary/10"
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                <span className="hidden sm:inline">{label}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* View Content */}
       {view === "grid" ? (
         <GridView lang={lang} isHebrew={isHebrew} t={t} searchParams={searchParams} setSearchParams={setSearchParams} />
+      ) : view === "graph" ? (
+        <GraphView isHebrew={isHebrew} />
       ) : (
         <TimelineView lang={lang} isHebrew={isHebrew} />
       )}

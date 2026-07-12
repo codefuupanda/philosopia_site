@@ -75,6 +75,11 @@ export default [
         descriptionHe: "אסכולה מימי הביניים שניסתה ליישב בין התיאולוגיה הנוצרית לבין הפילוסופיה הקלאסית (אריסטו)."
     },
     {
+        id: "political_realism", nameEn: "Political Realism", nameHe: "ריאליזם פוליטי", periodId: "renaissance_period",
+        descriptionEn: "A school of political thought that judges rulers and states by the realities of power rather than by moral ideals.",
+        descriptionHe: "אסכולה במחשבה המדינית השופטת שליטים ומדינות לפי מציאות הכוח ולא לפי אידיאלים מוסריים."
+    },
+    {
         id: "rationalism", nameEn: "Rationalism", nameHe: "רציונליזם", periodId: "early_modern_period",
         descriptionEn: "The view that reason is the chief source and test of knowledge.",
         descriptionHe: "ההשקפה שהתבונה היא המקור העיקרי והמבחן לידע."
@@ -118,5 +123,10 @@ export default [
         id: "analytic_philosophy", nameEn: "Analytic Philosophy", nameHe: "פילוסופיה אנליטית", periodId: "modern_period",
         descriptionEn: "A style of philosophy emphasizing clarity and argument, often using formal logic.",
         descriptionHe: "סגנון פילוסופי המדגיש בהירות וטיעון, לעתים קרובות תוך שימוש בלוגיקה פורמלית."
+    },
+    {
+        id: "philosophy_of_science", nameEn: "Philosophy of Science", nameHe: "פילוסופיה של המדע", periodId: "modern_period",
+        descriptionEn: "Examines the foundations and methods of science — what counts as knowledge, evidence, and a valid theory.",
+        descriptionHe: "בוחנת את היסודות והשיטות של המדע — מה נחשב לידע, לראיה ולתיאוריה תקפה."
     }
 ];

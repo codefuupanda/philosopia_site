@@ -18,5 +18,13 @@ export default defineConfig({
   },
   server: {
     port: 3000, // match the CRA-era workflow and docs
+    // Same-origin /api in dev, mirroring nginx in production — the app calls
+    // relative /api/... URLs and never deals with CORS.
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5001',
+        changeOrigin: true,
+      },
+    },
   },
 });

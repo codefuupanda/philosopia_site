@@ -46,7 +46,8 @@ app.use("/api/quotes", quotesRoutes);
 app.use("/api/works", worksRoutes);
 app.use("/api/analytics", analyticsRoutes);
 
-const PORT = process.env.PORT || 5000;
+// 5001, not 5000 — macOS AirPlay Receiver squats 5000 and stays enabled on this machine
+const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
   console.log(`API running on http://localhost:${PORT}`);
 });
