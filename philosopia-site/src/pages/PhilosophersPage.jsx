@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, { useEffect, useState, useCallback, useMemo, useRef, useLayoutEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useLanguage } from "../i18n/LanguageContext";
 import { usePhilosophersList, usePeriods } from "../hooks/queries";
@@ -159,7 +159,7 @@ function GridView({ lang, isHebrew, t, searchParams, setSearchParams }) {
       {/* Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {philosophers.map((phil) => (
-          <div key={phil.id} className="group flex flex-col bg-card border border-amber-500 rounded-xl shadow-lg hover:shadow-2xl hover:border-primary/50 hover:-translate-y-1 transition-all duration-300 p-6 h-full">
+          <div key={phil.id} className="group flex flex-col bg-card border border-border/60 rounded-2xl shadow-sm hover:shadow-[0_16px_40px_-12px_hsl(var(--primary)/0.25)] hover:border-primary/40 hover:-translate-y-1 transition-all duration-300 p-7 h-full">
 
             <Link to={`/${lang}/philosophers/${phil.id}`} className="block flex-grow">
 
@@ -236,7 +236,7 @@ function GridView({ lang, isHebrew, t, searchParams, setSearchParams }) {
                 onClick={() => goToPage(p)}
                 className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
                   p === page
-                    ? "bg-amber-500 text-black border border-amber-500"
+                    ? "bg-primary text-primary-foreground border border-primary"
                     : "border border-border bg-card hover:bg-primary/10 hover:border-primary/30"
                 }`}
               >
@@ -402,7 +402,7 @@ function TimelineView({ lang, isHebrew }) {
     <div dir={isHebrew ? 'rtl' : 'ltr'} className="min-h-screen bg-background text-foreground font-sans flex flex-col md:flex-row">
 
       {/* MOBILE HEADER */}
-      <div className="md:hidden flex items-center justify-between p-4 border-b border-amber-500 bg-background sticky top-0 z-50">
+      <div className="md:hidden flex items-center justify-between p-4 border-b border-border/60 bg-background/80 backdrop-blur-md sticky top-0 z-50">
         <span className="font-bold text-primary">
           {activeEra ? (isHebrew ? activeEra.nameHe : activeEra.nameEn) : ''}
         </span>
@@ -413,14 +413,14 @@ function TimelineView({ lang, isHebrew }) {
 
       {/* SIDEBAR NAVIGATION */}
       <aside className={`
-          fixed inset-y-0 z-40 flex bg-background/95 backdrop-blur border-e border-amber-500/30 transform transition-transform duration-300 ease-in-out
-          md:sticky md:top-0 md:h-screen md:translate-x-0
+          fixed inset-y-0 z-40 flex bg-background/95 backdrop-blur-md transform transition-transform duration-300 ease-in-out
+          md:sticky md:top-0 md:h-screen md:translate-x-0 md:bg-transparent md:backdrop-blur-none
           ${isSidebarOpen ? 'translate-x-0' : (isHebrew ? 'translate-x-full' : '-translate-x-full')}
           ${isHebrew ? 'right-0 md:right-auto' : 'left-0 md:left-auto'}
       `}>
 
-        {/* VERTICAL TAB RAIL */}
-        <div className="w-12 md:w-16 bg-muted/30 border-e border-amber-500/20 flex flex-col items-center py-6 gap-8 overflow-y-auto scrollbar-hide">
+        {/* VERTICAL TAB RAIL — floating dots, no chrome */}
+        <div className="w-12 md:w-16 flex flex-col items-center py-6 gap-8 overflow-y-auto scrollbar-hide">
           {eras.map((era, index) => {
             const isActive = activeEraIndex === index;
             return (
@@ -437,8 +437,8 @@ function TimelineView({ lang, isHebrew }) {
                 title={isHebrew ? era.nameHe : era.nameEn}
               >
                 <div className={`
-                  w-3 h-3 rounded-full border border-amber-500 transition-all
-                  ${isActive ? 'bg-amber-500 shadow-[0_0_10px_#d97706]' : 'bg-transparent group-hover:bg-amber-500/30'}
+                  w-3 h-3 rounded-full border border-primary/70 transition-all duration-300
+                  ${isActive ? 'bg-primary shadow-[0_0_12px_hsl(var(--primary)/0.8)]' : 'bg-transparent group-hover:bg-primary/30'}
                 `} />
                 <span className="writing-vertical-lr text-[10px] font-mono tracking-widest uppercase text-foreground/80 whitespace-nowrap py-2" style={{ writingMode: 'vertical-rl' }}>
                   {isHebrew ? era.nameHe : era.nameEn.split(' ')[0]}
@@ -448,9 +448,9 @@ function TimelineView({ lang, isHebrew }) {
           })}
         </div>
 
-        {/* ACTIVE ERA PANEL */}
-        <div className="w-42 flex flex-col h-full bg-card/50">
-          <div className="p-6 border-b border-amber-500/20">
+        {/* ACTIVE ERA PANEL — floating text index */}
+        <div className="w-42 flex flex-col h-full">
+          <div className="p-6">
             <h2 className="text-xl font-serif font-bold text-foreground">
               {activeEra ? (isHebrew ? activeEra.nameHe : activeEra.nameEn) : "Philosopia"}
             </h2>
@@ -462,12 +462,12 @@ function TimelineView({ lang, isHebrew }) {
           <ScrollArea className="flex-1 py-6 ps-4 pe-2" dir={isHebrew ? 'rtl' : 'ltr'}>
             {activeEra && (
               <div className="relative">
-                <div className="absolute top-2 bottom-2 w-px bg-amber-500/30 ltr:left-[11px] rtl:right-[11px]" />
+                <div className="absolute top-2 bottom-2 w-px bg-border/70 ltr:left-[11px] rtl:right-[11px]" />
 
-                <div className="space-y-1">
+                <div className="space-y-0.5">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-6 h-6 rounded-full bg-amber-500/10 border border-amber-500 flex items-center justify-center shrink-0 z-10">
-                      <div className="w-2 h-2 bg-amber-500 rounded-full" />
+                    <div className="w-6 h-6 rounded-full border border-primary/50 flex items-center justify-center shrink-0 z-10 bg-background">
+                      <div className="w-2 h-2 bg-primary rounded-full" />
                     </div>
                     <span className="font-bold text-sm text-foreground">
                       {isHebrew ? "פילוסופים" : "Philosophers"}
@@ -485,18 +485,17 @@ function TimelineView({ lang, isHebrew }) {
                           setIsSidebarOpen(false);
                         }}
                         className={`
-                           group relative w-full flex items-center gap-3 py-2 px-2 rounded-md transition-all duration-200
+                           group relative w-full flex items-center gap-2.5 py-1.5 px-2 transition-colors duration-200
                            ltr:ml-3 rtl:mr-3
-                           ${isSelected
-                            ? 'bg-amber-500 text-black shadow-md'
-                            : 'hover:bg-amber-500/10 text-muted-foreground hover:text-foreground'}
+                           ${isSelected ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}
                          `}
                       >
-                        <div className={`
-                           absolute top-1/2 w-3 h-px bg-amber-500/30
-                           ltr:-left-3 rtl:-right-3
-                         `} />
-
+                        <span
+                          aria-hidden
+                          className={`w-1.5 h-1.5 rounded-full shrink-0 transition-all duration-300 ${
+                            isSelected ? 'bg-primary shadow-[0_0_8px_hsl(var(--primary)/0.9)]' : 'bg-border group-hover:bg-primary/40'
+                          }`}
+                        />
                         <span className={`text-xs truncate ${isSelected ? 'font-bold' : 'font-medium'}`}>
                           {isHebrew ? phil.nameHe : phil.nameEn}
                         </span>
@@ -524,10 +523,10 @@ function TimelineView({ lang, isHebrew }) {
           const eraPhilosophers = era.philosophers || []; // pre-sorted chronologically in the eras memo
 
           return (
-            <section key={era.id} id={`era-${era.id}`} className="relative border-b border-amber-500/20 last:border-0 pb-20">
+            <section key={era.id} id={`era-${era.id}`} className="relative border-b border-border/40 last:border-0 pb-20">
 
               {/* ERA HERO SECTION */}
-              <div className="sticky top-0 z-30 bg-background/95 backdrop-blur border-b border-amber-500/50 py-6 px-6 md:px-12 shadow-sm transition-all duration-300">
+              <div className="sticky top-0 z-30 bg-background/85 backdrop-blur-md border-b border-border/60 py-6 px-6 md:px-12 transition-all duration-300">
                 <div className="container mx-auto">
                   <div className="flex items-baseline justify-between">
                     <h2 className="font-serif font-bold text-3xl md:text-5xl text-primary">
@@ -603,11 +602,11 @@ function TimelineView({ lang, isHebrew }) {
                         <div className={`ms-10 ${isStart ? 'md:ms-0 md:me-auto' : 'md:ms-auto'} md:w-[calc(50%-3.5rem)]`}>
                           <Card
                             onClick={() => setSelectedPhilosopher(phil)}
-                            className={`group cursor-pointer overflow-hidden rounded-xl bg-card border transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-primary/50 ${
-                              isActive ? 'border-primary/60 shadow-lg ring-1 ring-primary/25' : 'border-border shadow-sm'
+                            className={`group cursor-pointer overflow-hidden rounded-2xl bg-card border transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_40px_-12px_hsl(var(--primary)/0.25)] hover:border-primary/40 ${
+                              isActive ? 'border-primary/50 shadow-[0_8px_30px_-10px_hsl(var(--primary)/0.2)]' : 'border-border/60 shadow-sm'
                             }`}
                           >
-                            <div className="flex items-start gap-4 p-5">
+                            <div className="flex items-start gap-4 p-6">
                               {/* Portrait */}
                               <div className="w-16 h-16 shrink-0 rounded-lg overflow-hidden border border-border bg-muted">
                                 {phil.imageUrl ? (
@@ -668,7 +667,7 @@ function TimelineView({ lang, isHebrew }) {
 
       {/* DETAILS MODAL */}
       <Dialog open={!!selectedPhilosopher} onOpenChange={() => setSelectedPhilosopher(null)}>
-        <DialogContent dir={isHebrew ? "rtl" : "ltr"} className="border-amber-500 max-w-3xl overflow-y-auto max-h-[90vh]">
+        <DialogContent dir={isHebrew ? "rtl" : "ltr"} className="border-border/60 rounded-2xl max-w-3xl overflow-y-auto max-h-[90vh]">
           {selectedPhilosopher && (
             <>
               <DialogHeader>
@@ -681,7 +680,7 @@ function TimelineView({ lang, isHebrew }) {
               </DialogHeader>
 
               <div className="grid md:grid-cols-2 gap-6 py-4">
-                <div className="aspect-square rounded-lg overflow-hidden border border-amber-500 shadow-lg">
+                <div className="aspect-square rounded-xl overflow-hidden border border-border/60 shadow-lg">
                   {selectedPhilosopher.imageUrl &&
                     <img src={selectedPhilosopher.imageUrl} alt={selectedPhilosopher.nameEn} className="w-full h-full object-cover transition-all" />
                   }
@@ -698,7 +697,7 @@ function TimelineView({ lang, isHebrew }) {
                     </p>
                   </div>
 
-                  <Separator className="bg-amber-500/30" />
+                  <Separator className="bg-border" />
 
                   <div>
                     <h4 className="flex items-center gap-2 text-foreground font-bold mb-2 uppercase text-xs tracking-widest">
@@ -723,6 +722,58 @@ function TimelineView({ lang, isHebrew }) {
           )}
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+// ─── View switcher (glassmorphic segmented pill) ─────────────────────────────
+
+// A floating pill with a measured sliding thumb, so switching views feels like
+// a native segmented control. offsetLeft/width are physical values, which is
+// exactly what the absolutely-positioned thumb needs — RTL works untouched.
+function ViewSwitcher({ view, setView, viewTabs, isHebrew }) {
+  const containerRef = useRef(null);
+  const [thumb, setThumb] = useState(null);
+
+  useLayoutEffect(() => {
+    const el = containerRef.current?.querySelector(`[data-view="${view}"]`);
+    if (!el) return;
+    const measure = () => setThumb({ left: el.offsetLeft, width: el.offsetWidth });
+    measure();
+    const observer = new ResizeObserver(measure); // labels collapse to icons on xs
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [view, isHebrew]);
+
+  return (
+    <div
+      ref={containerRef}
+      role="tablist"
+      aria-label={isHebrew ? "בחירת תצוגה" : "Choose view"}
+      className="relative flex items-center gap-1 p-1.5 rounded-full border border-border/60 bg-card/60 backdrop-blur-md shadow-lg shadow-black/5 shrink-0"
+    >
+      {thumb && (
+        <span
+          aria-hidden
+          className="absolute top-1.5 bottom-1.5 rounded-full bg-primary shadow-md transition-all duration-300 ease-out"
+          style={{ left: thumb.left, width: thumb.width }}
+        />
+      )}
+      {viewTabs.map(({ key, label, Icon }) => (
+        <button
+          key={key}
+          data-view={key}
+          role="tab"
+          aria-selected={view === key}
+          onClick={() => setView(key)}
+          className={`relative z-10 flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-colors duration-300 ${
+            view === key ? "text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          <Icon className="w-4 h-4" />
+          <span className="hidden sm:inline">{label}</span>
+        </button>
+      ))}
     </div>
   );
 }
@@ -778,28 +829,7 @@ export default function PhilosophersPage() {
           </div>
 
           {/* View switcher — Timeline | Grid | Graph */}
-          <div
-            role="tablist"
-            aria-label={isHebrew ? "בחירת תצוגה" : "Choose view"}
-            className="flex items-center gap-1 p-1 rounded-lg border border-border bg-card shadow-sm shrink-0"
-          >
-            {viewTabs.map(({ key, label, Icon }) => (
-              <button
-                key={key}
-                role="tab"
-                aria-selected={view === key}
-                onClick={() => setView(key)}
-                className={`flex items-center gap-2 px-3.5 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
-                  view === key
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground hover:bg-primary/10"
-                }`}
-              >
-                <Icon className="w-4 h-4" />
-                <span className="hidden sm:inline">{label}</span>
-              </button>
-            ))}
-          </div>
+          <ViewSwitcher view={view} setView={setView} viewTabs={viewTabs} isHebrew={isHebrew} />
         </div>
       </div>
 

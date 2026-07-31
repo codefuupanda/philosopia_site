@@ -21,11 +21,7 @@ import BeefDetailPage from "./pages/BeefDetailPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import SchoolsPage from "./pages/SchoolsPage";
 import SchoolDetailsPage from './pages/SchoolDetailPage';
-import ConceptsPage from "./pages/ConceptsPage";
-import ConceptDetailPage from "./pages/ConceptDetailPage";
 import ArtAndPhiloPage from "./pages/ArtAndPhiloPage";
-import WorksPage from "./pages/WorksPage";
-import QuotesPage from "./pages/QuotesPage";
 import LoginPage from "./pages/LoginPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import { AuthProvider, useAuth } from "./context/AuthContext";
@@ -74,10 +70,7 @@ function AppShell() {
   const navLinks = [
     { to: `${basePath}/philosophers`, label: t.navPhilosophers },
     { to: `${basePath}/schools`, label: t.navSchools },
-    { to: `${basePath}/concepts`, label: t.navConcepts },
     { to: `${basePath}/beefs`, label: t.navBeefs },
-    { to: `${basePath}/works`, label: t.navWorks },
-    { to: `${basePath}/quotes`, label: t.navQuotes },
     { to: `${basePath}/art-and-philo`, label: t.navArtAndPhilo },
     { to: `${basePath}/about`, label: t.navAbout },
   ];
@@ -154,10 +147,8 @@ function AppShell() {
             <Route path="/:lang/beefs/:id" element={<BeefDetailPage />} />
             <Route path="/:lang/schools" element={<SchoolsPage />} />
             <Route path="/:lang/schools/:id" element={<SchoolDetailsPage />} />
-            <Route path="/:lang/concepts" element={<ConceptsPage />} />
-            <Route path="/:lang/concepts/:id" element={<ConceptDetailPage />} />
-            <Route path="/:lang/works" element={<WorksPage />} />
-            <Route path="/:lang/quotes" element={<QuotesPage />} />
+            {/* Concepts / Works ("The Library") / Quotes ("The Oracle") were
+                shelved 2026-07-12 — see CLAUDE.md Roadmap. */}
             <Route path="/:lang/art-and-philo" element={<ArtAndPhiloPage />} />
             {/* Graph became a Philosophers-page view (2026-07-12); keep old links alive */}
             <Route path="/:lang/graph" element={<Navigate to={`${basePath}/philosophers?view=graph`} replace />} />

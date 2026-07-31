@@ -24,19 +24,12 @@ export const api = {
     getSchools: () => get('/schools'),
     getSchool: (id) => get(`/schools/${id}`),
 
-    // Concepts
+    // Concepts (page shelved 2026-07-12; list endpoint still feeds admin stats)
     getConcepts: () => get('/concepts'),
-    getConcept: (id) => get(`/concepts/${id}`),
 
     // Beefs
     getBeefs: () => get('/beefs'),
     getBeef: (id) => get(`/beefs/${id}`),
-
-    // Works
-    getWorks: (lang) => get('/works', { lang }),
-
-    // Quotes
-    getQuotes: (lang, filters = {}) => get('/quotes', { lang, ...filters }),
 
     // Artworks
     getArtworks: () => get('/artworks'),

@@ -57,7 +57,6 @@ export default function PhilosopherPage() {
 
   const { data, isLoading: loading, isError } = usePhilosopher(id);
   const philosopher = data?.philosopher;
-  const linkedConcepts = data?.linkedConcepts ?? [];
 
   if (loading) return <div className="p-20 flex justify-center"><Loader /></div>;
   if (isError || !philosopher) return <div className="p-20 text-center text-destructive text-xl">Philosopher Not Found</div>;
@@ -145,26 +144,6 @@ export default function PhilosopherPage() {
                   >
                     {philosopher.schoolId.replace(/_/g, ' ')}
                   </Link>
-                </div>
-              )}
-
-              {/* ✅ 2. Linked Concepts (Reverse Lookup) */}
-              {linkedConcepts.length > 0 && (
-                <div className="mb-4 border-b border-border/40 pb-3">
-                  <span className="font-bold text-primary block text-xs uppercase tracking-wider mb-2">
-                    {isHebrew ? 'מושגים קשורים' : 'Related Concepts'}
-                  </span>
-                  <div className="flex flex-wrap gap-2">
-                    {linkedConcepts.map(c => (
-                      <Link
-                        key={c.id}
-                        to={`/${language}/concepts/${c.id}`}
-                        className="text-sm text-primary bg-muted border border-border hover:bg-muted/80 hover:border-primary px-2 py-1 rounded transition-colors"
-                      >
-                        {isHebrew ? c.nameHe : c.nameEn}
-                      </Link>
-                    ))}
-                  </div>
                 </div>
               )}
 

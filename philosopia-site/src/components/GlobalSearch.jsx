@@ -2,22 +2,21 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Command } from 'cmdk';
 import Fuse from 'fuse.js';
-import { Search, Brain, Library, Lightbulb, Swords } from 'lucide-react';
+import { Search, Brain, Library, Swords } from 'lucide-react';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useSearchIndex } from '../hooks/queries';
 
 const TYPE_META = {
     philosopher: { icon: Brain, route: 'philosophers', labelEn: 'Philosophers', labelHe: 'פילוסופים' },
     school: { icon: Library, route: 'schools', labelEn: 'Schools', labelHe: 'אסכולות' },
-    concept: { icon: Lightbulb, route: 'concepts', labelEn: 'Concepts', labelHe: 'מושגים' },
     beef: { icon: Swords, route: 'beefs', labelEn: 'Beefs', labelHe: 'ריבים' },
 };
-const GROUP_ORDER = ['philosopher', 'school', 'concept', 'beef'];
+const GROUP_ORDER = ['philosopher', 'school', 'beef'];
 const MAX_PER_GROUP = 8;
 
 /**
  * Global search — a ⌘K / Ctrl+K command palette over the whole catalog
- * (philosophers, schools, concepts, beefs), fuzzy-matched with Fuse.js across
+ * (philosophers, schools, beefs), fuzzy-matched with Fuse.js across
  * both languages. Renders its own navbar trigger button + the dialog.
  */
 export function GlobalSearch() {
@@ -109,7 +108,7 @@ export function GlobalSearch() {
                         <Command.Input
                             value={query}
                             onValueChange={setQuery}
-                            placeholder={isHebrew ? 'חיפוש פילוסופים, אסכולות, מושגים, ריבים…' : 'Search philosophers, schools, concepts, beefs…'}
+                            placeholder={isHebrew ? 'חיפוש פילוסופים, אסכולות, ריבים…' : 'Search philosophers, schools, beefs…'}
                             className="w-full py-3.5 bg-transparent outline-none text-sm text-foreground placeholder:text-muted-foreground"
                         />
                     </div>

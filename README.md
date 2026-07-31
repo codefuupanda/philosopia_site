@@ -4,13 +4,14 @@
 
 ## Key Features
 
+- **A minimalist, quote-first homepage.** The landing page opens on Aristotle's "one swallow does not make a summer" (Nicomachean Ethics) in elegant serif, followed by a single hook line and three doorways into the site: the Timeline, the influence Network, and the Schools of Thought.
 - **Rich bilingual biographies — 66/66 coverage.** Every philosopher has a full English *and* Hebrew biography, auto-enriched from Wikipedia/Wikidata (portraits, life years, influences, students, citizenship), with a curated bilingual summary as a graceful fallback.
 - **True bilingual UI (RTL/LTR).** All content is stored in English and Hebrew; URLs are prefixed `/en/` or `/he/`, fonts swap per language (Playfair Display/Inter for EN, Frank Ruhl Libre/Heebo for HE), and right-to-left layout applies automatically for Hebrew.
 - **Interactive relationship graph.** Philosopher relations from Wikidata are resolved against our own catalog: teachers, influences, students, and followers render as clickable chips that navigate between profiles, and a **force-directed influence map** (the **Graph** view on the Philosophers page, `?view=graph`; the old `/graph` URL redirects there) visualizes the whole network — era-colored nodes sized by influence, hover-highlighted neighborhoods, dashed inferred edges, and click-through to profiles, fully theme- and RTL-aware. The physics are tuned so the network spreads out readably on load, and you can **drag any node to pin it in place** (a dashed halo marks pinned nodes) — **right-click a pinned node to release it** back into the simulation. A control bar above the canvas turns the map into an analytical tool: color nodes by **school of thought** (auto-assigned palette + legend) or by era, toggle **Highlight Influence** to scale each thinker by their number of connections, toggle **Group by School** to pull same-school philosophers into visual islands, and **click any node to spotlight** its direct influences (click again or click the background to clear; double-click opens the profile). Reverse edges are inferred automatically — Socrates shows Aristotle and Nietzsche among his followers even though Wikidata only states the relation from their side. No graph database required — the whole graph lives in memory.
-- **Global search (⌘K).** A command palette over the whole catalog — philosophers, schools, concepts, and beefs — with fuzzy matching in both English and Hebrew, grouped results, and keyboard-first navigation.
+- **Global search (⌘K).** A command palette over the whole catalog — philosophers, schools, and beefs — with fuzzy matching in both English and Hebrew, grouped results, and keyboard-first navigation.
 - **Philosophical "Beefs".** Historical disagreements (e.g. Rationalism vs. Empiricism) framed in a fun, engaging way.
 - **Timeline & schools.** A chronological philosopher timeline from the Pre-Socratics to the 20th century, plus schools-of-thought pages with their member philosophers.
-- **Concepts and Art & Philosophy** sections, an admin dashboard with content management and built-in analytics, and dark/light themes.
+- **Art & Philosophy** section, an admin dashboard with content management and built-in analytics, and dark/light themes.
 
 ## Tech Stack
 
@@ -24,6 +25,17 @@
 | Orchestration | `concurrently` for local dev; Docker multi-stage builds (Node 22-alpine → nginx-alpine) |
 
 > **Note:** the project originally ran on MongoDB Atlas + Mongoose. MongoDB is **fully deprecated** — do not reintroduce it. All data access goes through the repository layer in `philosopia-api/db/`.
+
+## Design System
+
+The UI is driven entirely by semantic shadcn/Tailwind tokens (`bg-background`, `text-foreground`, `bg-card`, `text-primary`, …) mapped to CSS variables in `philosopia-site/src/index.css`, so every surface follows the active theme:
+
+| Mode | Name | Palette |
+|---|---|---|
+| Light | **The Library** | Pearl `#F9F9F8` background, deep charcoal `#1F2937` text, muted gold primary, soft sage accents |
+| Dark | **The Cave** | Deep slate `#0F172A` background, off-white text, glowing amber primary |
+
+Theme switching cross-fades smoothly (a global 250 ms color transition, disabled for reduced-motion users). Typography pairs a scholarly serif for headings and quotes (Playfair Display / Frank Ruhl Libre) with a clean sans for UI text (Inter / Heebo) — the pair swaps automatically per language.
 
 ## Monorepo Structure
 

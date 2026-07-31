@@ -67,16 +67,18 @@ const makeClusterForce = (centers, strength = 0.4) => {
     return force;
 };
 
+// Designed to sit inside the glassmorphic floating bar: inactive pills are
+// transparent text, the active one fills with the primary accent.
 const ControlPill = ({ active, onClick, title, children }) => (
     <button
         type="button"
         aria-pressed={active}
         title={title}
         onClick={onClick}
-        className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-colors ${
+        className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors duration-300 ${
             active
-                ? 'bg-primary text-primary-foreground border-primary shadow-sm'
-                : 'bg-card text-muted-foreground border-border hover:text-foreground hover:border-primary/40'
+                ? 'bg-primary text-primary-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground hover:bg-primary/10'
         }`}
     >
         {children}
@@ -323,32 +325,6 @@ export function RelationshipGraph() {
 
     return (
         <div>
-            {/* Control bar: color mode, influence sizing, school clustering */}
-            <div dir={isHebrew ? 'rtl' : 'ltr'} className="flex flex-wrap items-center gap-2 mb-3">
-                <span className="text-xs text-muted-foreground">{isHebrew ? 'צבע לפי:' : 'Color by:'}</span>
-                <ControlPill active={colorMode === 'school'} onClick={() => setColorMode('school')}>
-                    {isHebrew ? 'אסכולה' : 'School'}
-                </ControlPill>
-                <ControlPill active={colorMode === 'era'} onClick={() => setColorMode('era')}>
-                    {isHebrew ? 'תקופה' : 'Era'}
-                </ControlPill>
-                <span className="w-px h-5 bg-border mx-1.5" aria-hidden />
-                <ControlPill
-                    active={influenceMode}
-                    onClick={() => setInfluenceMode((v) => !v)}
-                    title={isHebrew ? 'גודל צומת לפי מספר הקשרים' : 'Scale node size by number of connections'}
-                >
-                    {isHebrew ? 'הדגשת השפעה' : 'Highlight Influence'}
-                </ControlPill>
-                <ControlPill
-                    active={groupBySchool}
-                    onClick={() => setGroupBySchool((v) => !v)}
-                    title={isHebrew ? 'קיבוץ פיזי של הוגים מאותה אסכולה' : 'Physically cluster same-school philosophers'}
-                >
-                    {isHebrew ? 'קיבוץ לפי אסכולה' : 'Group by School'}
-                </ControlPill>
-            </div>
-
             {/* Legend follows the active color mode */}
             <div dir={isHebrew ? 'rtl' : 'ltr'} className="flex flex-wrap gap-x-4 gap-y-1.5 mb-4">
                 {colorMode === 'era'
@@ -370,7 +346,38 @@ export function RelationshipGraph() {
                 </span>
             </div>
 
-            <div ref={containerRef} className="bg-card border border-border rounded-xl overflow-hidden">
+            <div ref={containerRef} className="relative bg-card border border-border/60 rounded-2xl overflow-hidden">
+                {/* Floating action bar — glassmorphic pill overlaying the canvas */}
+                <div
+                    dir={isHebrew ? 'rtl' : 'ltr'}
+                    className="absolute top-3 start-3 z-10 max-w-[calc(100%-1.5rem)] flex flex-wrap items-center gap-1 p-1.5 rounded-full border border-border/50 bg-card/70 backdrop-blur-md shadow-lg shadow-black/10"
+                >
+                    <span className="text-[11px] text-muted-foreground ps-2 pe-0.5 select-none">
+                        {isHebrew ? 'צבע לפי:' : 'Color by:'}
+                    </span>
+                    <ControlPill active={colorMode === 'school'} onClick={() => setColorMode('school')}>
+                        {isHebrew ? 'אסכולה' : 'School'}
+                    </ControlPill>
+                    <ControlPill active={colorMode === 'era'} onClick={() => setColorMode('era')}>
+                        {isHebrew ? 'תקופה' : 'Era'}
+                    </ControlPill>
+                    <span className="w-px h-4 bg-border/70 mx-1" aria-hidden />
+                    <ControlPill
+                        active={influenceMode}
+                        onClick={() => setInfluenceMode((v) => !v)}
+                        title={isHebrew ? 'גודל צומת לפי מספר הקשרים' : 'Scale node size by number of connections'}
+                    >
+                        {isHebrew ? 'הדגשת השפעה' : 'Highlight Influence'}
+                    </ControlPill>
+                    <ControlPill
+                        active={groupBySchool}
+                        onClick={() => setGroupBySchool((v) => !v)}
+                        title={isHebrew ? 'קיבוץ פיזי של הוגים מאותה אסכולה' : 'Physically cluster same-school philosophers'}
+                    >
+                        {isHebrew ? 'קיבוץ לפי אסכולה' : 'Group by School'}
+                    </ControlPill>
+                </div>
+
                 {size.width > 0 && (
                     <ForceGraph2D
                         ref={fgRef}

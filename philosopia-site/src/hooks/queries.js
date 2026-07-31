@@ -38,14 +38,6 @@ export const useSchools = () =>
 export const useSchool = (id) =>
     useQuery({ queryKey: ['school', id], queryFn: () => api.getSchool(id), enabled: !!id });
 
-// ─── Concepts ────────────────────────────────────────────────────────────────
-
-export const useConcepts = () =>
-    useQuery({ queryKey: ['concepts'], queryFn: api.getConcepts });
-
-export const useConcept = (id) =>
-    useQuery({ queryKey: ['concept', id], queryFn: () => api.getConcept(id), enabled: !!id });
-
 // ─── Beefs ───────────────────────────────────────────────────────────────────
 
 export const useBeefs = () =>
@@ -54,13 +46,7 @@ export const useBeefs = () =>
 export const useBeef = (id) =>
     useQuery({ queryKey: ['beef', id], queryFn: () => api.getBeef(id), enabled: !!id });
 
-// ─── Works / Quotes / Artworks ───────────────────────────────────────────────
-
-export const useWorks = (lang) =>
-    useQuery({ queryKey: ['works', lang], queryFn: () => api.getWorks(lang) });
-
-export const useQuotes = (lang) =>
-    useQuery({ queryKey: ['quotes', lang], queryFn: () => api.getQuotes(lang) });
+// ─── Artworks ────────────────────────────────────────────────────────────────
 
 // `enhance` lets the caller enrich the raw artworks (e.g. Wikimedia Commons
 // image lookups) inside the cached queryFn, so the expensive external calls
@@ -86,10 +72,9 @@ export const useSearchIndex = (enabled = true) =>
         enabled,
         staleTime: 10 * 60 * 1000,
         queryFn: async () => {
-            const [philosophers, schools, concepts, beefs] = await Promise.all([
+            const [philosophers, schools, beefs] = await Promise.all([
                 api.getPhilosophers({ page: 1, limit: 500 }),
                 api.getSchools(),
-                api.getConcepts(),
                 api.getBeefs(),
             ]);
             const docs = [];
@@ -108,14 +93,6 @@ export const useSearchIndex = (enabled = true) =>
                     type: 'school', id: s.id,
                     nameEn: s.nameEn, nameHe: s.nameHe,
                     subEn: s.descriptionEn, subHe: s.descriptionHe,
-                    alias: '',
-                });
-            }
-            for (const c of concepts.concepts || []) {
-                docs.push({
-                    type: 'concept', id: c.id,
-                    nameEn: c.nameEn, nameHe: c.nameHe,
-                    subEn: c.summaryEn, subHe: c.summaryHe,
                     alias: '',
                 });
             }

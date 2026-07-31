@@ -23,59 +23,61 @@
 
 @layer base {
   :root {
-    /* --- LIGHT MODE ("The Library") --- */
-    --background: 60 42% 93%;
-    /* Ivory #F7F6E2 */
-    --foreground: 189 40% 5%;
-    /* Rich Black Text */
-    --card: 45 36% 90%;
-    /* Almond Milk */
-    --card-foreground: 189 40% 5%;
-    --popover: 60 42% 93%;
-    --popover-foreground: 189 40% 5%;
-    --primary: 189 40% 5%;
-    /* Dark Button */
-    --primary-foreground: 60 42% 93%;
-    --secondary: 45 36% 85%;
-    --secondary-foreground: 189 40% 5%;
-    --muted: 45 20% 85%;
-    --muted-foreground: 189 20% 30%;
-    --accent: 45 36% 85%;
-    --accent-foreground: 189 40% 5%;
+    /* --- LIGHT MODE ("The Library" — pearl, charcoal, earth tones; 2026-07-12) --- */
+    --background: 60 8% 97%;
+    /* Pearl #F9F9F8 */
+    --foreground: 215 28% 17%;
+    /* Deep Charcoal #1F2937 */
+    --card: 60 9% 99%;
+    /* Near-white card, a breath above the pearl bg */
+    --card-foreground: 215 28% 17%;
+    --popover: 60 9% 99%;
+    --popover-foreground: 215 28% 17%;
+    --primary: 41 60% 40%;
+    /* Muted Gold #A37E29 */
+    --primary-foreground: 60 9% 98%;
+    --secondary: 140 12% 88%;
+    /* Soft Sage surface */
+    --secondary-foreground: 150 15% 22%;
+    --muted: 50 8% 92%;
+    --muted-foreground: 215 15% 42%;
+    --accent: 140 12% 90%;
+    /* Sage hover tint */
+    --accent-foreground: 215 28% 17%;
     --destructive: 358 60% 36%;
     /* Crimson Ember #922926 */
-    --destructive-foreground: 60 42% 93%;
-    --border: 30 15% 80%;
-    --input: 30 15% 80%;
-    --ring: 189 40% 5%;
+    --destructive-foreground: 60 9% 98%;
+    --border: 45 10% 86%;
+    --input: 45 10% 86%;
+    --ring: 41 60% 40%;
     --radius: 0.5rem;
   }
 
   .dark {
-    /* --- DARK MODE ("The Cave" - DEFAULT) --- */
-    --background: 189 40% 5%;
-    /* Rich Black #071011 */
-    --foreground: 60 10% 90%;
-    /* Off-White Text */
-    --card: 40 5% 18%;
-    /* Obsidian #2E2D2B */
-    --card-foreground: 60 10% 90%;
-    --popover: 189 40% 5%;
-    --popover-foreground: 60 10% 90%;
-    --primary: 39 77% 55%;
-    /* Hunyadi Yellow (Gold) */
-    --primary-foreground: 189 40% 5%;
-    --secondary: 40 5% 25%;
-    --secondary-foreground: 60 10% 90%;
-    --muted: 189 20% 15%;
-    --muted-foreground: 60 5% 60%;
-    --accent: 40 5% 25%;
-    --accent-foreground: 60 10% 90%;
-    --destructive: 358 60% 45%;
-    --destructive-foreground: 60 10% 90%;
-    --border: 189 20% 15%;
-    --input: 189 20% 15%;
-    --ring: 39 77% 55%;
+    /* --- DARK MODE ("The Cave" — deep slate, glowing amber; 2026-07-12) --- */
+    --background: 222 47% 11%;
+    /* Deep Slate #0F172A */
+    --foreground: 210 40% 96%;
+    /* Off-White #F1F5F9 */
+    --card: 217 33% 17%;
+    /* Elevated slate #1E293B */
+    --card-foreground: 210 40% 96%;
+    --popover: 222 47% 13%;
+    --popover-foreground: 210 40% 96%;
+    --primary: 43 89% 58%;
+    /* Glowing Amber #F4BE38 */
+    --primary-foreground: 222 47% 11%;
+    --secondary: 217 28% 24%;
+    --secondary-foreground: 210 40% 96%;
+    --muted: 217 30% 20%;
+    --muted-foreground: 215 18% 65%;
+    --accent: 217 28% 24%;
+    --accent-foreground: 210 40% 96%;
+    --destructive: 358 65% 52%;
+    --destructive-foreground: 210 40% 96%;
+    --border: 217 28% 22%;
+    --input: 217 28% 22%;
+    --ring: 43 89% 58%;
   }
 }
 
@@ -91,6 +93,19 @@ body {
   font-family: var(--font-family-base);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Smooth light/dark mode switching: colors cross-fade instead of snapping.
+   Guarded for reduced-motion users; transform/opacity animations unaffected. */
+@media (prefers-reduced-motion: no-preference) {
+  body,
+  body *,
+  body *::before,
+  body *::after {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-duration: 250ms;
+    transition-timing-function: ease;
+  }
 }
 
 /* Wiki Content overrides for Dark Mode */
