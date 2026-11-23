@@ -16,8 +16,11 @@ import analyticsRoutes from "./routes/analytics.js";
 import requestLogger from "./middleware/requestLogger.js";
 import { cacheMiddleware } from "./middleware/cache.js";
 import healthCheck from "./middleware/healthCheck.js";
+import { validateJwtConfig } from "./config/auth.js";
 
 // .env is loaded by db/client.js (works regardless of cwd)
+// Fail before any connectivity check or listener can start.
+validateJwtConfig();
 
 const app = express();
 

@@ -8,12 +8,23 @@ export async function getByUsername(username) {
   const res = await ddb.send(new GetCommand({
     TableName: TABLES.users,
     Key: { username },
+    ConsistentRead: true,
   }));
   return res.Item || null;
 }
 
-export async function putUser({ username, passwordHash, role = 'admin' }) {
+// Creation only: a concurrent registration must never replace an existing user.
+// Callers must explicitly choose a role; the HTTP route authorizes that choice.
+export async function putUser({ username, passwordHash, role }) {
+  if (typeof role !== 'string' || !role.trim()) {
+    throw new TypeError('User role must be explicitly provided');
+  }
   const user = { username, password: passwordHash, role };
-  await ddb.send(new PutCommand({ TableName: TABLES.users, Item: user }));
+  await ddb.send(new PutCommand({
+    TableName: TABLES.users,
+    Item: user,
+    ConditionExpression: 'attribute_not_exists(#username)',
+    ExpressionAttributeNames: { '#username': 'username' },
+  }));
   return user;
 }

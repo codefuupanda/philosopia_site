@@ -1,7 +1,7 @@
 import express from "express";
 import { listByType, getById, getByIds, put, deleteById } from "../db/content.js";
 import { withFlatAliases } from "../db/aliases.js";
-import { protect } from "../middleware/authMiddleware.js";
+import { protect, requireAdmin } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -48,7 +48,7 @@ router.get("/:id", async (req, res) => {
 // POST /api/beefs (Create new beef) - PROTECTED
 // Accepts either nested { title, description } or legacy flat titleEn/titleHe,
 // and philosopher references as string business ids (philosopherAId or philosopherA).
-router.post("/", protect, async (req, res) => {
+router.post("/", protect, requireAdmin, async (req, res) => {
   try {
     const b = req.body;
 
@@ -74,7 +74,7 @@ router.post("/", protect, async (req, res) => {
 });
 
 // DELETE /api/beefs/:id (Delete beef) - PROTECTED
-router.delete("/:id", protect, async (req, res) => {
+router.delete("/:id", protect, requireAdmin, async (req, res) => {
   try {
     const old = await deleteById("beef", req.params.id);
     if (!old) return res.status(404).json({ error: "Beef not found" });
